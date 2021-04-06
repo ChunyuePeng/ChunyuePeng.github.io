@@ -120,7 +120,7 @@
 <meta property="og:image" content="http://chunyuepeng.github.io/2021/04/06/Spring%E5%AD%A6%E4%B9%A0-%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E7%9A%84/23.png">
 <meta property="og:image" content="http://chunyuepeng.github.io/2021/04/06/Spring%E5%AD%A6%E4%B9%A0-%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E7%9A%84/24.png">
 <meta property="article:published_time" content="2021-04-06T02:26:08.000Z">
-<meta property="article:modified_time" content="2021-04-06T10:41:06.110Z">
+<meta property="article:modified_time" content="2021-04-06T11:57:54.257Z">
 <meta property="article:author" content="彭椿悦">
 <meta property="article:tag" content="bean加载">
 <meta property="article:tag" content="循环依赖">
@@ -347,7 +347,7 @@
     <link itemprop="mainEntityOfPage" href="http://chunyuepeng.github.io/2021/04/06/Spring%E5%AD%A6%E4%B9%A0-%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E7%9A%84/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
+      <meta itemprop="name" content="彭椿悦">
       <meta itemprop="description" content="">
       <meta itemprop="image" content="/images/avatar.gif">
     </span>
@@ -468,7 +468,7 @@
 <p>我们打上断点，并进入此方法<img src="/2021/04/06/Spring%E5%AD%A6%E4%B9%A0-%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E7%9A%84/10.png"><br>最终该方法又会调用<code>resolveReference</code>方法，我们进入此方法，在此方法中我们看到了一个熟悉的方法<code>getBean</code><img src="/2021/04/06/Spring%E5%AD%A6%E4%B9%A0-%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E7%9A%84/11.png"><br>还记得刚才加载bean a时也调用了这个方法了吗？那么此时应该去创建bean b了，流程和前面创建bean a的流程是一致的。所以我们直接在doCreateBean方法中打上断点，并进入此方法。<img src="/2021/04/06/Spring%E5%AD%A6%E4%B9%A0-%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E7%9A%84/12.png"><br>当实例化完b之后（b的地址为3029）也会创建b的对象工厂加入三级缓存，之后去填充bean b中的属性a。根据前面的讲解我们可以知道当调用<code>polulateBean</code>方法时最后会调用<code>doGetBean</code>方法，所以我们直接在<code>doGetBean</code>方法中打上断点。<br><img src="/2021/04/06/Spring%E5%AD%A6%E4%B9%A0-%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E7%9A%84/13.png"><br>之后会调用<code>getSingleton</code>方法，我们进入此方法。<img src="/2021/04/06/Spring%E5%AD%A6%E4%B9%A0-%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E7%9A%84/14.png"><br>还记得之前我们调用<code>doCreateBean</code>方法时已经把a标记为创建中了吗？所以此时程序是能进入到第一个if语句的。我们往下执行。<br><img src="/2021/04/06/Spring%E5%AD%A6%E4%B9%A0-%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E7%9A%84/15.png"><br>程序运行的结果也确实如此，singletonObject为null说明此时二级缓存中也没有a的实例。之后的逻辑就比较简单了，先从三级缓存中取出a的对象工厂，之后从工厂中取出bean a，之后再把该对象放到二级缓存当中并把三级缓存中的对象工厂移除。你可以把从工厂中取出的a和前面创建的a的地址比较一下，会发现就是前面创建的a对象<img src="/2021/04/06/Spring%E5%AD%A6%E4%B9%A0-%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E7%9A%84/16.png"><br>之后我们一直执行，执行完<code>populateBean</code>方法之后再去看b对象中的a属性。这时候b中的a就已经被赋值了。<img src="/2021/04/06/Spring%E5%AD%A6%E4%B9%A0-%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E7%9A%84/17.png"><br>属性值填充完成之后就是对b进行初始化，之后我们在一直执行到<code>getSingleton</code>方法，此时b已经实例化并且初始化完成了，之后所需要的就是将该对象放入到单例池中就ok了。<img src="/2021/04/06/Spring%E5%AD%A6%E4%B9%A0-%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E7%9A%84/18.png"><br>至此，b的加载就已经完成了，当a的populateBean完成之后，我们可以debug看下，此时a中的b已经被成功填充了。<img src="/2021/04/06/Spring%E5%AD%A6%E4%B9%A0-%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E7%9A%84/19.png"><br>之后就是将a加入到一级缓存中完成a的加载。<img src="/2021/04/06/Spring%E5%AD%A6%E4%B9%A0-%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E7%9A%84/20.png"><br>以上a和b的加载就算完成了。</p>
 <h1 id="为什么要使用三级缓存"><a href="#为什么要使用三级缓存" class="headerlink" title="为什么要使用三级缓存"></a>为什么要使用三级缓存</h1><p>为什么要使用三级缓存，一级缓存行不行？二级缓存呢？</p>
 <h2 id="一级缓存能解决循环依赖吗？"><a href="#一级缓存能解决循环依赖吗？" class="headerlink" title="一级缓存能解决循环依赖吗？"></a>一级缓存能解决循环依赖吗？</h2><p>答案是否定的，首先你得搞清楚一级缓存中放的是啥？一级缓存中存放的是成品对象，如果成品对象和半成品对象同时方法单例池中。那么整个流程假设如下进行<img src="/2021/04/06/Spring%E5%AD%A6%E4%B9%A0-%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E7%9A%84/21.png"><br>该流程是没问题的，但这只能满足满足单线程的IOC情况，当在多线程情况下，那么可能拿到半成品A这样的bean是不能被使用的。</p>
-<h2 id="二级缓存能解决循环依赖吗？"><a href="#二级缓存能解决循环依赖吗？" class="headerlink" title="二级缓存能解决循环依赖吗？"></a>二级缓存能解决循环依赖吗？</h2><p>答案是在不考虑AOP的情况下，二级缓存是可以解决循环依赖的。如果成品放在一级缓存中，半成品放在二级缓存中。假设整个流程如下进行<img src="/2021/04/06/Spring%E5%AD%A6%E4%B9%A0-%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E7%9A%84/22.png"><br>从上面的流程来看确实是没问题的，并且解决了多线程情况下可能取到半成品的问题。这点我们可以看下源码，在实例化完成bean之后会将创建bean的工厂对象并加入三级缓存<img src="/2021/04/06/Spring%E5%AD%A6%E4%B9%A0-%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E7%9A%84/23.png"><br>我们进入<code>getEarlyBeanReference</code>方法并在此方法内打上断点<br><img src="/2021/04/06/Spring%E5%AD%A6%E4%B9%A0-%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E7%9A%84/24.png"><br>我们可以看到当没有aop时，该方法直接返回了传入的bean。这操作就相当于将bean存入三级缓存，又从三级缓存中取出放入二级缓存，此时三级缓存是没有起任何作用的。所以在不考虑aop的情况下二级缓存是可以解决循环依赖的。那你可能会说：从二级缓存中取bean对象时生成代理对象不就行了吗？这样确实是可行的，但是这样会导致一个问题：在实例化完成之后就必须执行后置处理器（BeanPostProcessor），判断是否有AnnotationAwareAspectJAutoProxyCreator并创建代理对象。那么这样就违背了bean的生命周期的设计初衷了。</p>
+<h2 id="二级缓存能解决循环依赖吗？"><a href="#二级缓存能解决循环依赖吗？" class="headerlink" title="二级缓存能解决循环依赖吗？"></a>二级缓存能解决循环依赖吗？</h2><p>答案是在不考虑AOP的情况下，二级缓存是可以解决循环依赖的。如果成品放在一级缓存中，半成品放在二级缓存中。假设整个流程如下进行<img src="/2021/04/06/Spring%E5%AD%A6%E4%B9%A0-%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E7%9A%84/22.png"><br>从上面的流程来看确实是没问题的，并且解决了多线程情况下可能取到半成品的问题。这点我们可以看下源码，在实例化完成bean之后会将创建bean的工厂对象并加入三级缓存<img src="/2021/04/06/Spring%E5%AD%A6%E4%B9%A0-%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E7%9A%84/23.png"><br>我们进入<code>getEarlyBeanReference</code>方法并在此方法内打上断点<br><img src="/2021/04/06/Spring%E5%AD%A6%E4%B9%A0-%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E7%9A%84/24.png"><br>我们可以看到当没有aop时，该方法直接返回了传入的bean。这操作就相当于将bean存入三级缓存，又从三级缓存中取出放入二级缓存，此时三级缓存是没有起任何作用的。在Spring中三级缓存的主要作用就是生成代理对象，所以在不考虑aop的情况下二级缓存是可以解决循环依赖的。那你可能会说：从二级缓存中取bean对象时生成代理对象不就行了吗？这样确实是可行的，但是这样会导致一个问题：在实例化完成之后就必须执行后置处理器（BeanPostProcessor），判断是否有AnnotationAwareAspectJAutoProxyCreator并创建代理对象。那么这样就违背了bean的生命周期的设计初衷了。</p>
 <h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>循环依赖的解决是通过三级缓存来解决的，一级缓存为单例池(singletonObjects)，二级缓存为提前曝光的对象(earlySingletonObjects)，三级缓存为对象工厂(singletonFactories)。使用三级缓存是为了满足AOP功能的，当有AOP时通过三级缓存获取到的就是生成的代理对象，当不存在AOP时，通过三级缓存获取到的就是实例化后的对象。</p>
 
       
@@ -487,9 +487,9 @@
   <script src="https://cdn.bootcss.com/jquery/2.0.0/jquery.min.js"></script>
   <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
   <p><span>本文标题:</span><a href="/2021/04/06/Spring%E5%AD%A6%E4%B9%A0-%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E7%9A%84/">Spring学习-循环依赖是如何解决的</a></p>
-  <p><span>文章作者:</span><a href="/" title="访问  的个人博客"></a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 彭椿悦 的个人博客">彭椿悦</a></p>
   <p><span>发布时间:</span>2021年04月06日 - 10:04</p>
-  <p><span>最后更新:</span>2021年04月06日 - 18:04</p>
+  <p><span>最后更新:</span>2021年04月06日 - 19:04</p>
   <p><span>原始链接:</span><a href="/2021/04/06/Spring%E5%AD%A6%E4%B9%A0-%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E7%9A%84/" title="Spring学习-循环依赖是如何解决的">http://chunyuepeng.github.io/2021/04/06/Spring%E5%AD%A6%E4%B9%A0-%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E7%9A%84/</a>
     <span class="copy-path"  title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="http://chunyuepeng.github.io/2021/04/06/Spring%E5%AD%A6%E4%B9%A0-%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E7%9A%84/"  aria-label="复制成功！"></i></span>
   </p>
@@ -623,7 +623,7 @@
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
-              <p class="site-author-name" itemprop="name"></p>
+              <p class="site-author-name" itemprop="name">彭椿悦</p>
               <p class="site-description motion-element" itemprop="description"></p>
           </div>
 
@@ -786,8 +786,6 @@
   
 
 
-  
-
 
 
 
@@ -826,11 +824,6 @@
   
   
     <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
-  
-
-  
-  
-    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
   
 
 
@@ -1231,8 +1224,6 @@
 
   
 
-  
-    <script type="text/javascript" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
   
 </body>
 </html>
