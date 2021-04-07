@@ -78,7 +78,7 @@
 
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="Spring,IoC," />
 
 
 
@@ -89,14 +89,18 @@
 
 
 
-<meta property="og:type" content="website">
-<meta property="og:title" content="categories">
-<meta property="og:url" content="http://chunyuepeng.github.io/categories/index.html">
+<meta name="description" content="简介见名知意，我们可以知道invokeBeanFactoryPostProcessors方法的作用就是调用BeanFactoryPostProcessors接口的实现类，BeanFactoryPostProcessor接口与BeanPostProcessor接口类似，可以对bean信息（配置元数据）进行处理。 BeanFactoryPostProcessor使用Beans.xml123456789">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring学习-refresh方法之invokeBeanFactoryPostProcessors">
+<meta property="og:url" content="http://chunyuepeng.github.io/posts/4f99d2fa/index.html">
 <meta property="og:site_name" content="彭椿悦">
+<meta property="og:description" content="简介见名知意，我们可以知道invokeBeanFactoryPostProcessors方法的作用就是调用BeanFactoryPostProcessors接口的实现类，BeanFactoryPostProcessor接口与BeanPostProcessor接口类似，可以对bean信息（配置元数据）进行处理。 BeanFactoryPostProcessor使用Beans.xml123456789">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2021-04-02T10:32:49.000Z">
-<meta property="article:modified_time" content="2021-04-02T10:40:26.980Z">
+<meta property="article:published_time" content="2021-03-31T03:45:42.000Z">
+<meta property="article:modified_time" content="2021-04-07T08:38:31.852Z">
 <meta property="article:author" content="彭椿悦">
+<meta property="article:tag" content="Spring">
+<meta property="article:tag" content="IoC">
 <meta name="twitter:card" content="summary">
 
 
@@ -127,13 +131,13 @@
 
 
 
-  <link rel="canonical" href="http://chunyuepeng.github.io/categories/"/>
+  <link rel="canonical" href="http://chunyuepeng.github.io/posts/4f99d2fa/"/>
 
 
 
 
 
-  <title>categories | 彭椿悦</title>
+  <title>Spring学习-refresh方法之invokeBeanFactoryPostProcessors | 彭椿悦</title>
   
 
 
@@ -294,40 +298,237 @@
 
   <div id="posts" class="posts-expand">
     
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chunyuepeng.github.io/posts/4f99d2fa/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="彭椿悦">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="彭椿悦">
+    </span>
+
     
-    
-    <div class="post-block page">
       <header class="post-header">
 
-	<h1 class="post-title" itemprop="name headline">categories</h1>
-
-
-
-</header>
-
-      
-      
-      
-      <div class="post-body">
         
         
-          <div class="category-all-page">
-            <div class="category-all-title">
-                No categories
-            </div>
-            <div class="category-all">
+          <h1 class="post-title" itemprop="name headline">Spring学习-refresh方法之invokeBeanFactoryPostProcessors</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2021-03-31T11:45:42+08:00">
+                2021-03-31
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Words count in article&#58;</span>
+                
+                <span title="Words count in article">
+                  836
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Reading time &asymp;</span>
+                
+                <span title="Reading time">
+                  4
+                </span>
               
             </div>
-          </div>
-        
-      </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
       
       
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>见名知意，我们可以知道<code>invokeBeanFactoryPostProcessors</code>方法的作用就是调用BeanFactoryPostProcessors接口的实现类，BeanFactoryPostProcessor接口与BeanPostProcessor接口类似，可以对bean信息（配置元数据）进行处理。</p>
+<h1 id="BeanFactoryPostProcessor使用"><a href="#BeanFactoryPostProcessor使用" class="headerlink" title="BeanFactoryPostProcessor使用"></a>BeanFactoryPostProcessor使用</h1><h2 id="Beans-xml"><a href="#Beans-xml" class="headerlink" title="Beans.xml"></a>Beans.xml</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version&#x3D;&quot;1.0&quot; encoding&#x3D;&quot;UTF-8&quot;?&gt;</span><br><span class="line">&lt;beans xmlns&#x3D;&quot;http:&#x2F;&#x2F;www.springframework.org&#x2F;schema&#x2F;beans&quot;</span><br><span class="line">       xmlns:xsi&#x3D;&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2001&#x2F;XMLSchema-instance&quot;</span><br><span class="line">       xsi:schemaLocation&#x3D;&quot;http:&#x2F;&#x2F;www.springframework.org&#x2F;schema&#x2F;beans</span><br><span class="line">    http:&#x2F;&#x2F;www.springframework.org&#x2F;schema&#x2F;beans&#x2F;spring-beans-3.0.xsd&quot;&gt;</span><br><span class="line">    &lt;bean id&#x3D;&quot;a&quot; class&#x3D;&quot;pcy.InstantiationAwareBeanPostProcessor.A&quot; init-method&#x3D;&quot;initMethod&quot;&gt;</span><br><span class="line">		&lt;property name&#x3D;&quot;name&quot; value&#x3D;&quot;悦哥哥&quot;&#x2F;&gt;</span><br><span class="line">    &lt;&#x2F;bean&gt;</span><br><span class="line">	&lt;bean class&#x3D;&quot;pcy.InstantiationAwareBeanPostProcessor.MyInstantiationAwareBeanPostProcessor&quot;&#x2F;&gt;</span><br><span class="line">    &lt;bean class&#x3D;&quot;pcy.beanFactoryPostProcessor.CustomBeanFactoryPostProcessor&quot;&#x2F;&gt;</span><br><span class="line">&lt;&#x2F;beans&gt;</span><br></pre></td></tr></table></figure>
+<h2 id="CustomBeanFactoryPostProcessor-java"><a href="#CustomBeanFactoryPostProcessor-java" class="headerlink" title="CustomBeanFactoryPostProcessor,java"></a>CustomBeanFactoryPostProcessor,java</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public class CustomBeanFactoryPostProcessor implements BeanFactoryPostProcessor &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException &#123;</span><br><span class="line">        System.out.println(&quot;enter into postProcessBeanFactory&quot;);</span><br><span class="line">        BeanDefinition be &#x3D; beanFactory.getBeanDefinition(&quot;a&quot;);</span><br><span class="line">        &#x2F;&#x2F;获取到beanDefinition之后你可以对其进行修改等操作，例如你可以在配置文件中对数据库连接密码进行加密，</span><br><span class="line">        &#x2F;&#x2F;在此进行解密。</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Test-java"><a href="#Test-java" class="headerlink" title="Test.java"></a>Test.java</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public class Test &#123;</span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">		ApplicationContext context &#x3D; new ClassPathXmlApplicationContext(&quot;Beans.xml&quot;);</span><br><span class="line">		A a &#x3D; (A) context.getBean(&quot;a&quot;);</span><br><span class="line">		System.out.println(a.getName());</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="运行结果"><a href="#运行结果" class="headerlink" title="运行结果"></a>运行结果</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">enter into postProcessBeanFactory</span><br><span class="line">A被实例化</span><br></pre></td></tr></table></figure>
+<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>我们进入<code>invokeBeanFactoryPostProcessors()</code>方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">protected void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory) &#123;</span><br><span class="line">	PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(beanFactory, getBeanFactoryPostProcessors());(1)</span><br><span class="line"></span><br><span class="line">	&#x2F;&#x2F; Detect a LoadTimeWeaver and prepare for weaving, if found in the meantime</span><br><span class="line">	&#x2F;&#x2F; (e.g. through an @Bean method registered by ConfigurationClassPostProcessor)</span><br><span class="line">	if (!IN_NATIVE_IMAGE &amp;&amp; beanFactory.getTempClassLoader() &#x3D;&#x3D; null &amp;&amp; beanFactory.containsBean(LOAD_TIME_WEAVER_BEAN_NAME)) &#123;</span><br><span class="line">		beanFactory.addBeanPostProcessor(new LoadTimeWeaverAwareProcessor(beanFactory));</span><br><span class="line">		beanFactory.setTempClassLoader(new ContextTypeMatchClassLoader(beanFactory.getBeanClassLoader()));</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>从(1)我们可以知道BeanFactoryPostProcessor是在这里被调用的那么，那么这些BeanFactoryProcessor在哪里被加载进去的呢？通过debug得知，当执行<code>getBeanFactoryPostProcessor()</code>方法时，返回的其实是一个空数组，那么代表CustomBeanFactoryPostProcessor此时还并未加载到到容器当中。所以说我们自定义的CustomBeanFactoryPostProcessor并不是在此方法之前创建的，通过进入<code>PostProcessorRegistrationDelegate#invokeBeanFactoryPostProcessors()</code>方法（省略了一些不重要的过程）。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">public static void invokeBeanFactoryPostProcessors(</span><br><span class="line">		ConfigurableListableBeanFactory beanFactory, List&lt;BeanFactoryPostProcessor&gt; beanFactoryPostProcessors) &#123;</span><br><span class="line"></span><br><span class="line">	&#x2F;&#x2F; Invoke BeanDefinitionRegistryPostProcessors first, if any.</span><br><span class="line">	Set&lt;String&gt; processedBeans &#x3D; new HashSet&lt;&gt;();</span><br><span class="line">	&#x2F;*xxx: 首先处理 所有的BeanDefinitionRegistryPostProcessors工厂后置处理器接口*&#x2F;</span><br><span class="line">	.....</span><br><span class="line">	String[] postProcessorNames &#x3D; beanFactory.getBeanNamesForType(BeanFactoryPostProcessor.class, true, false);(1)</span><br><span class="line"></span><br><span class="line">	.....</span><br><span class="line">	List&lt;BeanFactoryPostProcessor&gt; nonOrderedPostProcessors &#x3D; new ArrayList&lt;&gt;(nonOrderedPostProcessorNames.size());</span><br><span class="line">	for (String postProcessorName : nonOrderedPostProcessorNames) &#123;</span><br><span class="line">		&#x2F;&#x2F;在这会根据bean name去获取BeanFactoryPostProcessor bean对象，此时容器中肯定是还没有此bean对象的，</span><br><span class="line">		&#x2F;&#x2F;所以说这里其实是先去创建BeanFactoryPostProcessor的bean对象</span><br><span class="line">		nonOrderedPostProcessors.add(beanFactory.getBean(postProcessorName, BeanFactoryPostProcessor.class));(2)</span><br><span class="line">	&#125;</span><br><span class="line">	invokeBeanFactoryPostProcessors(nonOrderedPostProcessors, beanFactory);(3)</span><br><span class="line">	&#x2F;&#x2F; Clear cached merged bean definitions since the post-processors might have</span><br><span class="line">	&#x2F;&#x2F; modified the original metadata, e.g. replacing placeholders in values...</span><br><span class="line">	beanFactory.clearMetadataCache();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在此方法中有三行非常重要的代码，也就是(1)-(3)这三行代码。执行代码(1)后，会从bean工厂找到所有实现<code>BeanFactoryPostProcessor</code>接口的实现类的beanname，在此例子中返回的是：pcy.beanFactoryPostProcessor.CustomBeanFactoryPostProcessor#0，然后看代码(2)，在这里会从beanFactory中获取我们实现类的bean对象，此时beanFactory是没有此bean对象的，此时回去创建我们的bean对象。所以，自定义的BeanFactoryPostProcessor是在这里被加载到context中的。然后就是调用代码(3)，也就执行了我们实现类的方法了。</p>
+
       
     </div>
     
     
     
+
+    <div>
+      
+        
+<div class="my_post_copyright">
+  <script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+  
+  <!-- JS库 sweetalert 可修改路径 -->
+  <script src="https://cdn.bootcss.com/jquery/2.0.0/jquery.min.js"></script>
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+  <p><span>本文标题:</span><a href="/posts/4f99d2fa/">Spring学习-refresh方法之invokeBeanFactoryPostProcessors</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 彭椿悦 的个人博客">彭椿悦</a></p>
+  <p><span>发布时间:</span>2021年03月31日 - 11:03</p>
+  <p><span>最后更新:</span>2021年04月07日 - 16:04</p>
+  <p><span>原始链接:</span><a href="/posts/4f99d2fa/" title="Spring学习-refresh方法之invokeBeanFactoryPostProcessors">http://chunyuepeng.github.io/posts/4f99d2fa/</a>
+    <span class="copy-path"  title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="http://chunyuepeng.github.io/posts/4f99d2fa/"  aria-label="复制成功！"></i></span>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者。</p>  
+</div>
+<script> 
+    var clipboard = new Clipboard('.fa-clipboard');
+	  $(".fa-clipboard").click(function(){
+      clipboard.on('success', function(){
+        swal({   
+          title: "",   
+          text: '复制成功',
+          icon: "success", 
+          showConfirmButton: true
+          });
+	    });
+    });  
+</script>
+
+
+      
+    </div>
+
+    
+
+    
+
+    
+	<div>
+      
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Spring/" rel="tag"><i class="fa fa-tag"></i> Spring</a>
+          
+            <a href="/tags/IoC/" rel="tag"><i class="fa fa-tag"></i> IoC</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/de434b88/" rel="next" title="Spring学习-refresh方法之prepareBeanFactory">
+                <i class="fa fa-chevron-left"></i> Spring学习-refresh方法之prepareBeanFactory
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/b9e6c2cb/" rel="prev" title="Spring学习-refresh方法之registerBeanPostProcessors">
+                Spring学习-refresh方法之registerBeanPostProcessors <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
   </div>
 
 
@@ -360,8 +561,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -479,6 +689,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#BeanFactoryPostProcessor%E4%BD%BF%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">BeanFactoryPostProcessor使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Beans-xml"><span class="nav-number">2.1.</span> <span class="nav-text">Beans.xml</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CustomBeanFactoryPostProcessor-java"><span class="nav-number">2.2.</span> <span class="nav-text">CustomBeanFactoryPostProcessor,java</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Test-java"><span class="nav-number">2.3.</span> <span class="nav-text">Test.java</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%90%E8%A1%8C%E7%BB%93%E6%9E%9C"><span class="nav-number">2.4.</span> <span class="nav-text">运行结果</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%86%E6%9E%90"><span class="nav-number">3.</span> <span class="nav-text">分析</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
