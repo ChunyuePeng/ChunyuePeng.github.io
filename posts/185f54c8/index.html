@@ -91,7 +91,7 @@
 
 <meta name="description" content="概述AOP和IOC是Spring的两大基石，aop原理系列文章我们将透过源码来解析aop的底层原理。使用过Spring aop的都知道，当我们要使用aop的时候只需要在配置文件中加上&lt;aop:aspectj-autoproxy&#x2F;&gt;这个标签和定义好切面，我们就能使用aop这个功能了。通过前面的文章你可能已经知道了aop的底层其实是通过JDK的动态代理和CGLIB的动态代理实现的，那么为什">
 <meta property="og:type" content="article">
-<meta property="og:title" content="AOP源码解析之&lt;aop:aspectj-autoproxy&#x2F;&gt;标签">
+<meta property="og:title" content="AOP源码解析之aop:aspectj-autoproxy标签">
 <meta property="og:url" content="http://chunyuepeng.github.io/posts/185f54c8/index.html">
 <meta property="og:site_name" content="彭椿悦">
 <meta property="og:description" content="概述AOP和IOC是Spring的两大基石，aop原理系列文章我们将透过源码来解析aop的底层原理。使用过Spring aop的都知道，当我们要使用aop的时候只需要在配置文件中加上&lt;aop:aspectj-autoproxy&#x2F;&gt;这个标签和定义好切面，我们就能使用aop这个功能了。通过前面的文章你可能已经知道了aop的底层其实是通过JDK的动态代理和CGLIB的动态代理实现的，那么为什">
@@ -100,7 +100,7 @@
 <meta property="og:image" content="http://chunyuepeng.github.io/posts/185f54c8/2.png">
 <meta property="og:image" content="http://chunyuepeng.github.io/posts/185f54c8/3.png">
 <meta property="article:published_time" content="2021-04-08T11:56:59.000Z">
-<meta property="article:modified_time" content="2021-04-08T12:43:49.986Z">
+<meta property="article:modified_time" content="2021-04-09T01:46:58.115Z">
 <meta property="article:author" content="彭椿悦">
 <meta property="article:tag" content="aop原理">
 <meta name="twitter:card" content="summary">
@@ -140,7 +140,7 @@
 
 
 
-  <title>AOP源码解析之<aop:aspectj-autoproxy/>标签 | 彭椿悦</title>
+  <title>AOP源码解析之aop:aspectj-autoproxy标签 | 彭椿悦</title>
   
 
 
@@ -330,7 +330,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">AOP源码解析之<aop:aspectj-autoproxy/>标签</h1>
+          <h1 class="post-title" itemprop="name headline">AOP源码解析之aop:aspectj-autoproxy标签</h1>
         
 
         <div class="post-meta">
@@ -431,7 +431,7 @@
 <li>postProcessAfterInitialization</li>
 </ul>
 <p>这四个方法非常的重要，在bean的生命周期中会去调用这几个方法。代理类的生成就是在<code>postProcessAfterInitialization</code>方法中进行的，Advisor的加载就是在<code>postProcessBeforeInstantiation</code>方法中实现的。那么我们将在后面的文章中详细讲解这几个方法中Spring所干的工作。</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>在本片文章中，主要讲解了当添加了<code>&lt;aop:aspectj-autoproxy/&gt;</code>标签之后，Spring为我们使用aop功能做了哪些准备工作以及代理类的生成是在哪？Advisor的加载是在哪里进行的。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>在本篇文章中，主要讲解了当添加了<code>&lt;aop:aspectj-autoproxy/&gt;</code>标签之后，Spring为我们使用aop功能做了哪些准备工作以及为代理类的生成提供了哪些支持？Advisor的加载是在哪里进行的。</p>
 
       
     </div>
@@ -448,11 +448,11 @@
   <!-- JS库 sweetalert 可修改路径 -->
   <script src="https://cdn.bootcss.com/jquery/2.0.0/jquery.min.js"></script>
   <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-  <p><span>本文标题:</span><a href="/posts/185f54c8/">AOP源码解析之<aop:aspectj-autoproxy/>标签</a></p>
+  <p><span>本文标题:</span><a href="/posts/185f54c8/">AOP源码解析之aop:aspectj-autoproxy标签</a></p>
   <p><span>文章作者:</span><a href="/" title="访问 彭椿悦 的个人博客">彭椿悦</a></p>
   <p><span>发布时间:</span>2021年04月08日 - 19:04</p>
-  <p><span>最后更新:</span>2021年04月08日 - 20:04</p>
-  <p><span>原始链接:</span><a href="/posts/185f54c8/" title="AOP源码解析之<aop:aspectj-autoproxy/>标签">http://chunyuepeng.github.io/posts/185f54c8/</a>
+  <p><span>最后更新:</span>2021年04月09日 - 09:04</p>
+  <p><span>原始链接:</span><a href="/posts/185f54c8/" title="AOP源码解析之aop:aspectj-autoproxy标签">http://chunyuepeng.github.io/posts/185f54c8/</a>
     <span class="copy-path"  title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="http://chunyuepeng.github.io/posts/185f54c8/"  aria-label="复制成功！"></i></span>
   </p>
   <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者。</p>  
@@ -518,6 +518,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/8a3989cc/" rel="prev" title="AOP源码解析之Advisor的加载">
+                AOP源码解析之Advisor的加载 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -598,7 +602,7 @@
               
                 <a href="/archives/%7C%7C%20archive">
               
-                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-count">17</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -644,7 +648,15 @@
       
       
         <li class="recent_posts_li">
-          <a href="/posts/185f54c8/" title="AOP源码解析之<aop:aspectj-autoproxy/>标签" target="_blank">AOP源码解析之<aop:aspectj-autoproxy/>标签</a>
+          <a href="/posts/47477f67/" title="AOP源码解析之代理类的生成" target="_blank">AOP源码解析之代理类的生成</a>
+        </li>
+      
+        <li class="recent_posts_li">
+          <a href="/posts/8a3989cc/" title="AOP源码解析之Advisor的加载" target="_blank">AOP源码解析之Advisor的加载</a>
+        </li>
+      
+        <li class="recent_posts_li">
+          <a href="/posts/185f54c8/" title="AOP源码解析之aop:aspectj-autoproxy标签" target="_blank">AOP源码解析之aop:aspectj-autoproxy标签</a>
         </li>
       
         <li class="recent_posts_li">
@@ -653,14 +665,6 @@
       
         <li class="recent_posts_li">
           <a href="/posts/8eeb963a/" title="java代理-JDK动态代理" target="_blank">java代理-JDK动态代理</a>
-        </li>
-      
-        <li class="recent_posts_li">
-          <a href="/posts/11f03654/" title="Spring学习-循环依赖是如何解决的" target="_blank">Spring学习-循环依赖是如何解决的</a>
-        </li>
-      
-        <li class="recent_posts_li">
-          <a href="/posts/9483b875/" title="Spring学习-bean的生命周期" target="_blank">Spring学习-bean的生命周期</a>
         </li>
       
     </ul>
@@ -742,7 +746,7 @@
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">15.6k</span>
+    <span title="Site words total count">19.6k</span>
   
 </div>
 
@@ -766,7 +770,7 @@
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count">博客全站共15.6k字</span>
+  <span class="post-count">博客全站共19.6k字</span>
 </div>
 
 
