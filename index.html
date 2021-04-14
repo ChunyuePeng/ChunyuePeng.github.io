@@ -292,7 +292,7 @@
             
 <div class="tag-cloud">
 	  <div class="tag-cloud-tags" id="tags">
-		<a href="/tags/Bean%E5%8A%A0%E8%BD%BD/" style="font-size: 16px; color: #fff">Bean加载</a> <a href="/tags/Bean%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/" style="font-size: 16px; color: #fff">Bean生命周期</a> <a href="/tags/IoC/" style="font-size: 16px; color: #fff">IoC</a> <a href="/tags/Listener/" style="font-size: 16px; color: #fff">Listener</a> <a href="/tags/Spring/" style="font-size: 16px; color: #fff">Spring</a> <a href="/tags/aop%E5%8E%9F%E7%90%86/" style="font-size: 16px; color: #fff">aop原理</a> <a href="/tags/bean-%E5%B7%A5%E5%8E%82/" style="font-size: 16px; color: #fff">bean 工厂</a> <a href="/tags/bean%E5%8A%A0%E8%BD%BD/" style="font-size: 16px; color: #fff">bean加载</a> <a href="/tags/proxy/" style="font-size: 16px; color: #fff">proxy</a> <a href="/tags/%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86/" style="font-size: 16px; color: #fff">动态代理</a> <a href="/tags/%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96/" style="font-size: 16px; color: #fff">循环依赖</a> <a href="/tags/%E6%89%A9%E5%B1%95/" style="font-size: 16px; color: #fff">扩展</a>
+		<a href="/tags/Bean%E5%8A%A0%E8%BD%BD/" style="font-size: 16px; color: #fff">Bean加载</a> <a href="/tags/Bean%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/" style="font-size: 16px; color: #fff">Bean生命周期</a> <a href="/tags/IoC/" style="font-size: 16px; color: #fff">IoC</a> <a href="/tags/Listener/" style="font-size: 16px; color: #fff">Listener</a> <a href="/tags/Spring/" style="font-size: 16px; color: #fff">Spring</a> <a href="/tags/Spring%E3%80%81%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86/" style="font-size: 16px; color: #fff">Spring、动态代理</a> <a href="/tags/aop%E5%8E%9F%E7%90%86/" style="font-size: 16px; color: #fff">aop原理</a> <a href="/tags/bean-%E5%B7%A5%E5%8E%82/" style="font-size: 16px; color: #fff">bean 工厂</a> <a href="/tags/bean%E5%8A%A0%E8%BD%BD/" style="font-size: 16px; color: #fff">bean加载</a> <a href="/tags/proxy/" style="font-size: 16px; color: #fff">proxy</a> <a href="/tags/%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86/" style="font-size: 16px; color: #fff">动态代理</a> <a href="/tags/%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96/" style="font-size: 16px; color: #fff">循环依赖</a> <a href="/tags/%E6%89%A9%E5%B1%95/" style="font-size: 16px; color: #fff">扩展</a>
 	  </div>
 	</div>
 	<br>
@@ -332,6 +332,338 @@
      transition-duration: 0.15s;
   }
 </style>
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chunyuepeng.github.io/posts/c2c8cd86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="彭椿悦">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="彭椿悦">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/posts/c2c8cd86/" itemprop="url">Spring异步（@Async）源码解析</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2021-04-14T10:11:06+08:00">
+                2021-04-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Words count in article&#58;</span>
+                
+                <span title="Words count in article">
+                  2.3k
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Reading time &asymp;</span>
+                
+                <span title="Reading time">
+                  10
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          概述用过Spring的应该都知道，在Spring中你只需要使用@Async和@EnableAsyc这两个注解就能完成方法的异步调用。那当使用这两个注解的时候，Spring到底做了些什么可以让我们的方法调用编程异步方法调用呢？本篇文章将带你探索其中的奥秘。
+示例代码MyService.java1234
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/posts/c2c8cd86/#more" rel="contents">
+              Read more &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    <div>
+      
+    </div>
+
+    
+
+    
+
+    
+	<div>
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chunyuepeng.github.io/posts/800ab950/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="彭椿悦">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="彭椿悦">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/posts/800ab950/" itemprop="url">AOP源码解析之被切入方法调用过程</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2021-04-12T19:04:23+08:00">
+                2021-04-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Words count in article&#58;</span>
+                
+                <span title="Words count in article">
+                  2.5k
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Reading time &asymp;</span>
+                
+                <span title="Reading time">
+                  9
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          概述在本篇文章中将带你搞清楚在使用aop的时候当调用被切入方法的时候，Spring到底做了些什么。
+源码解析我们在被切入的方法前打上断点，然后进入dubug通过前面的讲解我们已经知道了，aop的动态代理有jdk和cglib两种代理方式，在本篇文章中我们讨论的是jdk动态代理实现的aop的情况。我们知
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/posts/800ab950/#more" rel="contents">
+              Read more &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    <div>
+      
+    </div>
+
+    
+
+    
+
+    
+	<div>
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
 
     
       
@@ -1673,339 +2005,6 @@ JDK动态代理是如何实现？
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://chunyuepeng.github.io/posts/2bc3b25f/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="彭椿悦">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="彭椿悦">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/posts/2bc3b25f/" itemprop="url">Spring学习-refresh方法之registerListeners</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2021-03-31T20:00:58+08:00">
-                2021-03-31
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-            <div class="post-wordcount">
-              
-                
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-file-word-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">Words count in article&#58;</span>
-                
-                <span title="Words count in article">
-                  287
-                </span>
-              
-
-              
-                <span class="post-meta-divider">|</span>
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-clock-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">Reading time &asymp;</span>
-                
-                <span title="Reading time">
-                  1
-                </span>
-              
-            </div>
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          我们根据名字就可知道该该方法的作用就是注册事件监听器，进入该方法
-123456789101112131415161718192021222324protected void registerListeners() &#123;	&#x2F;&#x2F; Register statically spe
-          ...
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/posts/2bc3b25f/#more" rel="contents">
-              Read more &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    <div>
-      
-    </div>
-
-    
-
-    
-
-    
-	<div>
-      
-    </div>
-
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://chunyuepeng.github.io/posts/eba13e6c/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="彭椿悦">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="彭椿悦">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/posts/eba13e6c/" itemprop="url">Spring学习-refresh方法之initApplicationEventMulticaster</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2021-03-31T16:40:20+08:00">
-                2021-03-31
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-            <div class="post-wordcount">
-              
-                
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-file-word-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">Words count in article&#58;</span>
-                
-                <span title="Words count in article">
-                  658
-                </span>
-              
-
-              
-                <span class="post-meta-divider">|</span>
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-clock-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">Reading time &asymp;</span>
-                
-                <span title="Reading time">
-                  3
-                </span>
-              
-            </div>
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          多播器简介学过编程语言的应该对事件不陌生，当一些事件发生时，你需要通知其事件的监听器做相应的处理。这其实是设计模式中的观察者模式的典型应用。
-使用自定义事件在Spring中你只需要继承ApplicationEvent即可以完成一个自定义的事件。
-123456789101112131415161718
-          ...
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/posts/eba13e6c/#more" rel="contents">
-              Read more &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    <div>
-      
-    </div>
-
-    
-
-    
-
-    
-	<div>
-      
-    </div>
-
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2060,7 +2059,7 @@ JDK动态代理是如何实现？
               
                 <a href="/archives/%7C%7C%20archive">
               
-                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-count">19</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -2073,7 +2072,7 @@ JDK动态代理是如何实现？
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-count">13</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>
@@ -2106,6 +2105,14 @@ JDK动态代理是如何实现？
       
       
         <li class="recent_posts_li">
+          <a href="/posts/c2c8cd86/" title="Spring异步（@Async）源码解析" target="_blank">Spring异步（@Async）源码解析</a>
+        </li>
+      
+        <li class="recent_posts_li">
+          <a href="/posts/800ab950/" title="AOP源码解析之被切入方法调用过程" target="_blank">AOP源码解析之被切入方法调用过程</a>
+        </li>
+      
+        <li class="recent_posts_li">
           <a href="/posts/47477f67/" title="AOP源码解析之代理类的生成" target="_blank">AOP源码解析之代理类的生成</a>
         </li>
       
@@ -2115,14 +2122,6 @@ JDK动态代理是如何实现？
       
         <li class="recent_posts_li">
           <a href="/posts/185f54c8/" title="AOP源码解析之aop:aspectj-autoproxy标签" target="_blank">AOP源码解析之aop:aspectj-autoproxy标签</a>
-        </li>
-      
-        <li class="recent_posts_li">
-          <a href="/posts/253173a8/" title="AOP中的基本概念" target="_blank">AOP中的基本概念</a>
-        </li>
-      
-        <li class="recent_posts_li">
-          <a href="/posts/8eeb963a/" title="java代理-JDK动态代理" target="_blank">java代理-JDK动态代理</a>
         </li>
       
     </ul>
@@ -2188,7 +2187,7 @@ JDK动态代理是如何实现？
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">19.6k</span>
+    <span title="Site words total count">24.4k</span>
   
 </div>
 
@@ -2212,7 +2211,7 @@ JDK动态代理是如何实现？
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count">博客全站共19.6k字</span>
+  <span class="post-count">博客全站共24.4k字</span>
 </div>
 
 

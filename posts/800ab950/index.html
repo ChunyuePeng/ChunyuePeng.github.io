@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="code-bQSgDzUJpU" />
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="aop原理," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="概述在本篇文章中将带你搞清楚在使用aop的时候当调用被切入方法的时候，Spring到底做了些什么。 源码解析我们在被切入的方法前打上断点，然后进入dubug通过前面的讲解我们已经知道了，aop的动态代理有jdk和cglib两种代理方式，在本篇文章中我们讨论的是jdk动态代理实现的aop的情况。我们知道jdk动态代理中当调用被代理的方法的时候，会去调用InvocationHandler中的invok">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AOP源码解析之被切入方法调用过程">
+<meta property="og:url" content="http://chunyuepeng.github.io/posts/800ab950/index.html">
+<meta property="og:site_name" content="彭椿悦">
+<meta property="og:description" content="概述在本篇文章中将带你搞清楚在使用aop的时候当调用被切入方法的时候，Spring到底做了些什么。 源码解析我们在被切入的方法前打上断点，然后进入dubug通过前面的讲解我们已经知道了，aop的动态代理有jdk和cglib两种代理方式，在本篇文章中我们讨论的是jdk动态代理实现的aop的情况。我们知道jdk动态代理中当调用被代理的方法的时候，会去调用InvocationHandler中的invok">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://chunyuepeng.github.io/posts/800ab950/1.png">
+<meta property="og:image" content="http://chunyuepeng.github.io/posts/800ab950/2.png">
+<meta property="og:image" content="http://chunyuepeng.github.io/posts/800ab950/3.png">
+<meta property="og:image" content="http://chunyuepeng.github.io/posts/800ab950/4.png">
+<meta property="og:image" content="http://chunyuepeng.github.io/posts/800ab950/5.png">
+<meta property="og:image" content="http://chunyuepeng.github.io/posts/800ab950/6.png">
+<meta property="og:image" content="http://chunyuepeng.github.io/posts/800ab950/7.png">
+<meta property="og:image" content="http://chunyuepeng.github.io/posts/800ab950/8.png">
+<meta property="og:image" content="http://chunyuepeng.github.io/posts/800ab950/9.png">
+<meta property="og:image" content="http://chunyuepeng.github.io/posts/800ab950/10.png">
+<meta property="og:image" content="http://chunyuepeng.github.io/posts/800ab950/11.png">
+<meta property="og:image" content="http://chunyuepeng.github.io/posts/800ab950/12.png">
+<meta property="og:image" content="http://chunyuepeng.github.io/posts/800ab950/13.png">
+<meta property="og:image" content="http://chunyuepeng.github.io/posts/800ab950/14.png">
+<meta property="og:image" content="http://chunyuepeng.github.io/posts/800ab950/15.png">
+<meta property="og:image" content="http://chunyuepeng.github.io/posts/800ab950/16.png">
+<meta property="og:image" content="http://chunyuepeng.github.io/posts/800ab950/17.png">
+<meta property="og:image" content="http://chunyuepeng.github.io/posts/800ab950/18.png">
+<meta property="og:image" content="http://chunyuepeng.github.io/posts/800ab950/19.png">
+<meta property="og:image" content="http://chunyuepeng.github.io/posts/800ab950/20.png">
+<meta property="og:image" content="http://chunyuepeng.github.io/posts/800ab950/21.png">
+<meta property="og:image" content="http://chunyuepeng.github.io/posts/800ab950/22.png">
+<meta property="og:image" content="http://chunyuepeng.github.io/posts/800ab950/23.png">
+<meta property="og:image" content="http://chunyuepeng.github.io/posts/800ab950/24.png">
+<meta property="og:image" content="http://chunyuepeng.github.io/posts/800ab950/25.png">
+<meta property="og:image" content="http://chunyuepeng.github.io/posts/800ab950/26.png">
+<meta property="og:image" content="http://chunyuepeng.github.io/posts/800ab950/27.png">
+<meta property="article:published_time" content="2021-04-12T11:04:23.000Z">
+<meta property="article:modified_time" content="2021-04-13T08:29:13.239Z">
+<meta property="article:author" content="彭椿悦">
+<meta property="article:tag" content="aop原理">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://chunyuepeng.github.io/posts/800ab950/1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://chunyuepeng.github.io/posts/800ab950/"/>
+
+
+
+
+
+  <title>AOP源码解析之被切入方法调用过程 | 彭椿悦</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband">
+	<a target="_blank" rel="noopener" href="https://github.com/ChunyuePeng/chunyuepeng.github.io" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+	</div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">彭椿悦</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            Commonweal 404
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chunyuepeng.github.io/posts/800ab950/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="彭椿悦">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="彭椿悦">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">AOP源码解析之被切入方法调用过程</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2021-04-12T19:04:23+08:00">
+                2021-04-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Words count in article&#58;</span>
+                
+                <span title="Words count in article">
+                  2.5k
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Reading time &asymp;</span>
+                
+                <span title="Reading time">
+                  9
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>在本篇文章中将带你搞清楚在使用aop的时候当调用被切入方法的时候，Spring到底做了些什么。</p>
+<h1 id="源码解析"><a href="#源码解析" class="headerlink" title="源码解析"></a>源码解析</h1><p>我们在被切入的方法前打上断点，然后进入dubug<img src="/posts/800ab950/1.png"><br>通过前面的讲解我们已经知道了，aop的动态代理有jdk和cglib两种代理方式，在本篇文章中我们讨论的是jdk动态代理实现的aop的情况。我们知道jdk动态代理中当调用被代理的方法的时候，会去调用<code>InvocationHandler</code>中的<code>invoke</code>方法。我们运行程序，发现确实如此。<img src="/posts/800ab950/2.png"><br>我们可以看下当前类的结构图<img src="/posts/800ab950/3.png"><br>可以看到该类实现了<code>InvocationHandler</code>接口，现在就开始核心代码的分析了。</p>
+<h2 id="不需要使用拦截器链的方法"><a href="#不需要使用拦截器链的方法" class="headerlink" title="不需要使用拦截器链的方法"></a>不需要使用拦截器链的方法</h2><p>在aop中如果被调用的方法是equals、hashCode方法或者是继承自Advicsed类的方法，这几个类型的方法不需要使用拦截器链。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;equals方法处理</span><br><span class="line">if (!this.equalsDefined &amp;&amp; AopUtils.isEqualsMethod(method)) &#123;</span><br><span class="line">	&#x2F;&#x2F; The target does not implement the equals(Object) method itself.</span><br><span class="line">	return equals(args[0]);</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;&#x2F;hash方法的处理</span><br><span class="line">else if (!this.hashCodeDefined &amp;&amp; AopUtils.isHashCodeMethod(method)) &#123;</span><br><span class="line">	&#x2F;&#x2F; The target does not implement the hashCode() method itself.</span><br><span class="line">	return hashCode();</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;&#x2F;</span><br><span class="line">else if (method.getDeclaringClass() &#x3D;&#x3D; DecoratingProxy.class) &#123;</span><br><span class="line">	&#x2F;&#x2F; There is only getDecoratedClass() declared -&gt; dispatch to proxy config.</span><br><span class="line">	return AopProxyUtils.ultimateTargetClass(this.advised);</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;&#x2F;Advised接口或者其父接口中定义的方法，直接反射调用</span><br><span class="line">else if (!this.advised.opaque &amp;&amp; method.getDeclaringClass().isInterface() &amp;&amp;</span><br><span class="line">		method.getDeclaringClass().isAssignableFrom(Advised.class)) &#123;</span><br><span class="line">	&#x2F;&#x2F; Service invocations on ProxyConfig with the proxy config...</span><br><span class="line">	&#x2F;&#x2F;通过反射调用切入点方法</span><br><span class="line">	return AopUtils.invokeJoinpointUsingReflection(this.advised, method, args);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h2 id="获取拦截器链"><a href="#获取拦截器链" class="headerlink" title="获取拦截器链"></a>获取拦截器链</h2><p>如果调用的是被代理的方法，那么就需要先去获取被调用方法的拦截器链。<img src="/posts/800ab950/4.png"><br>我们在该行代码上打上断点，然后进入该方法中。可以看到在Spring中对方法的拦截器链做了缓存，如果缓存中不存在那么则去初始化拦截器链。<img src="/posts/800ab950/5.png"><br>由于这是第一次调用该方法，此时缓存中是没有此方法的拦截器链的。所以此时会去执行<code>getInterceptorsAndDynamicInterceptionAdvice</code>方法。<img src="/posts/800ab950/6.png"><br>在此方法中，首先去获取了Advisor的适配器，Spring对Advisor和MethodIntercepter做了适配。然后获取了被调用方法的bean的所有Advisor，这里的actualClass就是真正定义此方法的类。<img src="/posts/800ab950/7.png"><br>然后循环对所有的Advisor进行处理，获取其拦截器。在我们的示例代码中并没有引介增强器的定义，所以代码走的都是第一个分支。dubug进入第一个分支。<img src="/posts/800ab950/8.png"><br>首先通过Advisor中的Pointcut来判断此方法是否能够应用此Advice，如果能的话通过增强器去获取拦截器。<img src="/posts/800ab950/9.png"><br>在这里通过Advisor适配器去获取Advisor中的方法拦截器，也就是<code>getInterceptors</code>方法，dubug进入此方法。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">public MethodInterceptor[] getInterceptors(Advisor advisor) throws UnknownAdviceTypeException &#123;</span><br><span class="line">	List&lt;MethodInterceptor&gt; interceptors &#x3D; new ArrayList&lt;&gt;(3);</span><br><span class="line">	Advice advice &#x3D; advisor.getAdvice();</span><br><span class="line">	&#x2F;&#x2F;如果通知是MethodInterceptor类型的通知，直接加入interceptor</span><br><span class="line">	if (advice instanceof MethodInterceptor) &#123;</span><br><span class="line">		interceptors.add((MethodInterceptor) advice);</span><br><span class="line">	&#125;</span><br><span class="line">	&#x2F;&#x2F;对通知进行适配，使用已经配置好的Adapter:MethodBeforeAdviceAdapter、</span><br><span class="line">	&#x2F;&#x2F; AfterReturningAdviceAdapter以及ThrowsAdviceAdapter。</span><br><span class="line">	for (AdvisorAdapter adapter : this.adapters) &#123;</span><br><span class="line">		&#x2F;&#x2F;如果适配器支持该类型的Advice则取出封装完成的拦截器</span><br><span class="line">		if (adapter.supportsAdvice(advice)) &#123;</span><br><span class="line">			interceptors.add(adapter.getInterceptor(advisor));</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	if (interceptors.isEmpty()) &#123;</span><br><span class="line">		throw new UnknownAdviceTypeException(advisor.getAdvice());</span><br><span class="line">	&#125;</span><br><span class="line">	return interceptors.toArray(new MethodInterceptor[0]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在该方法内首先做了一个判断，如果此通知是MethodInterceptor类型的话直接加入到拦截器中。之后使用预配置的适配器判断是否支持该Advice。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public boolean supportsAdvice(Advice advice) &#123;</span><br><span class="line">	return (advice instanceof MethodBeforeAdvice);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="/posts/800ab950/10.png"><br>从debug信息可以得知，有三个适配器。分别是<code>MethodBeforeAdviceAdapter</code>、<code>AfterReturingAdviceAdapter</code>、<code>ThrowingAdviceAdapter</code>，判断用户用户定义的Advice是否被支持其实就是判断Advice是否实现了<code>MethodBeforeAdvice</code>、<code>AfterReturingAdvice</code>、<code>ThrowingAdvice</code>接口。完成以上操作之后取出拦截器返回，至此就完成了Advisor中的方法拦截器的获取了。构建完方法的拦截器链之后，将该拦截器链放入到缓存当中。<img src="/posts/800ab950/11.png"><br>获取完拦截器链之后判断拦截器链是否为空，如果没有拦截器则直接通过反射调用切点方法。<img src="/posts/800ab950/12.png"></p>
+<h2 id="拦截器链调用"><a href="#拦截器链调用" class="headerlink" title="拦截器链调用"></a>拦截器链调用</h2><p><img src="/posts/800ab950/13.png"><br>在进行拦截器链调用的时候，Spring先将代理对象、目标对象、目标方法、参数、拦截器链封装到了<code>ReflectiveMethodInvocation</code>中了，然后调用了<code>MethodInvocation#proceed()</code>方法进行调用。Spring在<code>ReflectiveMethodInvocation</code>中对proceed方法进行了重写，我们进入此方法。<img src="/posts/800ab950/14.png"><br>此时拦截和动态匹配方法器链中总共有四个对象，第一个是<code>ExposeInvocationInterceptor</code>，在上篇文章中我们已经讲过了该拦截器的作用就是暴露拦截器链，方便在其它地方使用。第二个是<code>AspectJAroudAdvice</code>，也就是环绕通知。第三个是<code>MethodBeforeAdviceInterceptor</code>，执行方法前的通知。第四个是<code>AspectJAfterAdvice</code>，是方法执行之后的通知。在该方法中首先做了一个判断，当前正在执行的拦截器是否是最后一个拦截器，如果是的话这里需要先去调用切点方法。此时肯定不是的，我们往下debug。<img src="/posts/800ab950/15.png"><br>接着从拦截器链中获取下一个需要执行的拦截器或者拦截通知。<img src="/posts/800ab950/16.png"><br>然后做了一个判断：判断此拦截器是否是<code>InterceptorAndDynamicMethodMatcher</code>类型的拦截器。如果是普通拦截器则直接调用<code>MethodInterceptor#invoke()</code>方法。上面提到的几个拦截器都是普通的拦截器，所以会进入下面的分支，我们进入invoke方法。在上面已经说过了第一个拦截器对象是<code>ExposeInvocationInterceptor</code>，Spring对invoke方法进行了重写。<img src="/posts/800ab950/17.png"><br>在前面我们提到过：<code>ExposeInvocationInterceptor</code>的作用就是暴露拦截器链，方便在其它地方调用，在该类中定义了一个invocation属性</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">private static final ThreadLocal&lt;MethodInvocation&gt; invocation &#x3D;</span><br><span class="line">			new NamedThreadLocal&lt;&gt;(&quot;Current AOP method invocation&quot;);</span><br></pre></td></tr></table></figure>
+<p>可以看到暴露拦截器链所使用的方法就是将MethodInvocation保存到ThreadLocal中。我们接着往下运行发现程序又回到了<code>ReflectiveMethodInvocation</code>的proceed方法中，因为我们刚才调用的时候将对象本身作为参数传入了，当我们调用proceed方法的时候这样就又回到了<code>ReflectiveMethodInvocation</code>的proceed方法中，这样就行成了链式调用。<br>我们接着往下看，此时当前需要执行的拦截器是第二个，也就是<code>AscpectJAroudAdvice</code>。<img src="/posts/800ab950/18.png"><br>接着往下执行，调用的是invoke方法，我们进入此方法。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public Object invoke(MethodInvocation mi) throws Throwable &#123;</span><br><span class="line">	if (!(mi instanceof ProxyMethodInvocation)) &#123;</span><br><span class="line">		throw new IllegalStateException(&quot;MethodInvocation is not a Spring ProxyMethodInvocation: &quot; + mi);</span><br><span class="line">	&#125;</span><br><span class="line">	ProxyMethodInvocation pmi &#x3D; (ProxyMethodInvocation) mi;</span><br><span class="line">	ProceedingJoinPoint pjp &#x3D; lazyGetProceedingJoinPoint(pmi);</span><br><span class="line">	JoinPointMatch jpm &#x3D; getJoinPointMatch(pmi);</span><br><span class="line">	return invokeAdviceMethod(pjp, jpm, null, null);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在该方法中显示做了一系列的封装、转化操作，然后去调用了通知方法，我么debug进入invokeAdviceMethod方法（该方法是父类AbstractAspectJAdvice中定义的方法）。<img src="/posts/800ab950/19.png"><br>在该方法中又将调用通知方法委派给了<code>invokeAdviceMethodWithGivenArgs</code>方法，我们进入该方法。<img src="/posts/800ab950/20.png"><br>当运行完红框中的代码后你会发现又回到了<code>ReflectiveMethodInvocation</code>的proceed方法中，在这里你可能会有疑惑了，没在代码中看到调用proceed方法啊，怎么跑到proceed方法中的呢？答案是：当前调用的通知方法是切面中定义的around方法，在around的方法中会去调用proceed方法。<img src="/posts/800ab950/21.png"><br>此时的控制台输出</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">before1</span><br></pre></td></tr></table></figure>
+<p>我们接着往下运行，当前应该执行的拦截器的index应该是2了，也就是<code>MethodBeforeAdviceInterceptor</code>。<img src="/posts/800ab950/22.png"><br>我们debug进入<code>MethodBeforeAdviceInterceptor</code>的invoke方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">public Object invoke(MethodInvocation mi) throws Throwable &#123;</span><br><span class="line">	this.advice.before(mi.getMethod(), mi.getArguments(), mi.getThis());</span><br><span class="line">	return mi.proceed();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在该方法中调用了方法执行前的通知方法，然后又去调用了proceed方法，当执行完此方法后，控制台的输出为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">before1</span><br><span class="line">before test..</span><br></pre></td></tr></table></figure>
+<p>我们接着运行，进入proceed方法。<img src="/posts/800ab950/23.png"><br>此时的currentInterceptorIndex等于2，所以还不会去调用切点方法。最后一个拦截器的类型为<code>AscpectJAfterAdvice</code>，我们接着运行进入此方法。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public Object invoke(MethodInvocation mi) throws Throwable &#123;</span><br><span class="line">	try &#123;</span><br><span class="line">		&#x2F;&#x2F;先调用切点方法</span><br><span class="line">		return mi.proceed();</span><br><span class="line">	&#125;</span><br><span class="line">	finally &#123;</span><br><span class="line">		invokeAdviceMethod(getJoinPointMatch(), null, null);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在该方法中，先去调用了<code>MethodInvocation</code>的proceed方法，此时<code>ReflectiveMethodInvocation</code>类中currentInterceptorIndex的值为3，所以当进入procced方法的时候，会去调用切点方法。当调用切点方法之后再去调用方法执行完成之后通知方法的调用。我们debug进入proceed方法。<img src="/posts/800ab950/24.png"><br>可以看到程序确实会去调用invokeJoinpoint，进入该方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">protected Object invokeJoinpoint() throws Throwable &#123;</span><br><span class="line">	return AopUtils.invokeJoinpointUsingReflection(this.target, this.method, this.arguments);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里就是直接通过反射进行了方法的调用，当执行完此方法后，控制台的输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">before1</span><br><span class="line">before test..</span><br><span class="line">这是一个快乐程序员</span><br></pre></td></tr></table></figure>
+<p>调用完切点方法之后，就是去调用方法执行之后的通知方法。<img src="/posts/800ab950/25.png"><br>在执行该方法之前会去获取之前存入ThreadLocal中的MethodInvocation，也就是调用<code>getJoinPointMatch</code>方法。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">protected JoinPointMatch getJoinPointMatch() &#123;</span><br><span class="line">	&#x2F;&#x2F;从ThreadLocal取出MethodInvocation</span><br><span class="line">	MethodInvocation mi &#x3D; ExposeInvocationInterceptor.currentInvocation();</span><br><span class="line">	if (!(mi instanceof ProxyMethodInvocation)) &#123;</span><br><span class="line">		throw new IllegalStateException(&quot;MethodInvocation is not a Spring ProxyMethodInvocation: &quot; + mi);</span><br><span class="line">	&#125;</span><br><span class="line">	return getJoinPointMatch((ProxyMethodInvocation) mi);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>当调用invokeAdviceMethod的时候流程就是和上面调用方法执行前的通知方法的流程是一样的了，这里就不重复说明了。当执行完该通知方法后控制台的输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">before1</span><br><span class="line">before test..</span><br><span class="line">这是一个快乐程序员</span><br><span class="line">after test..</span><br></pre></td></tr></table></figure>
+<p>我们一直运行下去，程序会进入到切面中的aroud通知方法中。<img src="/posts/800ab950/26.png"><br>执行完该通知方法，此时控制台输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">before1</span><br><span class="line">before test..</span><br><span class="line">这是一个快乐程序员</span><br><span class="line">after test..</span><br><span class="line">after1</span><br></pre></td></tr></table></figure>
+<p>拦截器链执行完成之后就是根据需要返回执行结果了。<img src="/posts/800ab950/27.png"><br>至此为止，被切入方法的调用过程就讲解完成了。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>在本篇文章中，对被切入方法的调用过程进行了介绍。在aop中，Spring时通过调用拦截器链的方式来实现方法功能的增强的。</p>
+
+      
+    </div>
+    
+    
+    
+
+    <div>
+      
+        
+<div class="my_post_copyright">
+  <script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+  
+  <!-- JS库 sweetalert 可修改路径 -->
+  <script src="https://cdn.bootcss.com/jquery/2.0.0/jquery.min.js"></script>
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+  <p><span>本文标题:</span><a href="/posts/800ab950/">AOP源码解析之被切入方法调用过程</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 彭椿悦 的个人博客">彭椿悦</a></p>
+  <p><span>发布时间:</span>2021年04月12日 - 19:04</p>
+  <p><span>最后更新:</span>2021年04月13日 - 16:04</p>
+  <p><span>原始链接:</span><a href="/posts/800ab950/" title="AOP源码解析之被切入方法调用过程">http://chunyuepeng.github.io/posts/800ab950/</a>
+    <span class="copy-path"  title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="http://chunyuepeng.github.io/posts/800ab950/"  aria-label="复制成功！"></i></span>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者。</p>  
+</div>
+<script> 
+    var clipboard = new Clipboard('.fa-clipboard');
+	  $(".fa-clipboard").click(function(){
+      clipboard.on('success', function(){
+        swal({   
+          title: "",   
+          text: '复制成功',
+          icon: "success", 
+          showConfirmButton: true
+          });
+	    });
+    });  
+</script>
+
+
+      
+    </div>
+
+    
+
+    
+
+    
+	<div>
+      
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/aop%E5%8E%9F%E7%90%86/" rel="tag"><i class="fa fa-tag"></i> aop原理</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/47477f67/" rel="next" title="AOP源码解析之代理类的生成">
+                <i class="fa fa-chevron-left"></i> AOP源码解析之代理类的生成
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/c2c8cd86/" rel="prev" title="Spring异步（@Async）源码解析">
+                Spring异步（@Async）源码解析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.gif"
+                alt="彭椿悦" />
+            
+              <p class="site-author-name" itemprop="name">彭椿悦</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:1399068529@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+		  
+
+  <div class="links-of-blogroll motion-element links-of-blogroll-block">
+    <div class="links-of-blogroll-title">
+      <!-- modify icon to fire by szw -->
+      <i class="fa fa-history fa-" aria-hidden="true"></i>
+      近期文章
+    </div>
+    <ul class="links-of-blogroll-list">
+      
+      
+        <li class="recent_posts_li">
+          <a href="/posts/c2c8cd86/" title="Spring异步（@Async）源码解析" target="_blank">Spring异步（@Async）源码解析</a>
+        </li>
+      
+        <li class="recent_posts_li">
+          <a href="/posts/800ab950/" title="AOP源码解析之被切入方法调用过程" target="_blank">AOP源码解析之被切入方法调用过程</a>
+        </li>
+      
+        <li class="recent_posts_li">
+          <a href="/posts/47477f67/" title="AOP源码解析之代理类的生成" target="_blank">AOP源码解析之代理类的生成</a>
+        </li>
+      
+        <li class="recent_posts_li">
+          <a href="/posts/8a3989cc/" title="AOP源码解析之Advisor的加载" target="_blank">AOP源码解析之Advisor的加载</a>
+        </li>
+      
+        <li class="recent_posts_li">
+          <a href="/posts/185f54c8/" title="AOP源码解析之aop:aspectj-autoproxy标签" target="_blank">AOP源码解析之aop:aspectj-autoproxy标签</a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://developer.apple.com/swift/" title="Swift 4" target="_blank">Swift 4</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://developer.apple.com/documentation/objectivec" title="Objective-C" target="_blank">Objective-C</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A6%82%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90"><span class="nav-number">2.</span> <span class="nav-text">源码解析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8D%E9%9C%80%E8%A6%81%E4%BD%BF%E7%94%A8%E6%8B%A6%E6%88%AA%E5%99%A8%E9%93%BE%E7%9A%84%E6%96%B9%E6%B3%95"><span class="nav-number">2.1.</span> <span class="nav-text">不需要使用拦截器链的方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E6%8B%A6%E6%88%AA%E5%99%A8%E9%93%BE"><span class="nav-number">2.2.</span> <span class="nav-text">获取拦截器链</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8B%A6%E6%88%AA%E5%99%A8%E9%93%BE%E8%B0%83%E7%94%A8"><span class="nav-number">2.3.</span> <span class="nav-text">拦截器链调用</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">彭椿悦</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">24.4k</span>
+  
+</div>
+
+
+  <div class="powered-by">
+    <i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
+    本站访客数:<span id="busuanzi_value_site_uv"></span>
+    </span>
+  </div>
+
+
+
+<!--
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+-->
+
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count">博客全站共24.4k字</span>
+</div>
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>
