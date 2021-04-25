@@ -105,7 +105,7 @@
 <meta property="og:image" content="http://chunyuepeng.github.io/posts/c2c8cd86/8.png">
 <meta property="og:image" content="http://chunyuepeng.github.io/posts/c2c8cd86/9.png">
 <meta property="article:published_time" content="2021-04-14T02:11:06.000Z">
-<meta property="article:modified_time" content="2021-04-14T08:02:53.020Z">
+<meta property="article:modified_time" content="2021-04-14T11:43:47.409Z">
 <meta property="article:author" content="彭椿悦">
 <meta property="article:tag" content="Spring、动态代理">
 <meta name="twitter:card" content="summary">
@@ -424,7 +424,7 @@
 <h2 id="Test-java"><a href="#Test-java" class="headerlink" title="Test.java"></a>Test.java</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">public class Test &#123;</span><br><span class="line">    public static void main(String[] args) throws ExecutionException, InterruptedException &#123;</span><br><span class="line">        ApplicationContext context &#x3D; new AnnotationConfigApplicationContext(AppConfig.class);</span><br><span class="line">        MyService bean &#x3D; context.getBean(MyService.class);</span><br><span class="line">        bean.hello(&quot;yuege&quot;);</span><br><span class="line">        bean.hello(null);</span><br><span class="line">        Future future &#x3D; bean.hello1(&quot;悦哥&quot;);</span><br><span class="line">        Future future1 &#x3D; bean.hello1(null);</span><br><span class="line">        System.out.println(future.get());</span><br><span class="line">        System.out.println(future1.get());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h1 id="源码解析"><a href="#源码解析" class="headerlink" title="源码解析"></a>源码解析</h1><h2 id="EnableAsync"><a href="#EnableAsync" class="headerlink" title="@EnableAsync"></a>@EnableAsync</h2><p>当我们使用了<code>@EnableAsync</code>的时候，Spring到底做了一些什么工作呢？我们打开该注解类。<img src="/posts/c2c8cd86/1.png"><br>可以看到使用该注解的时候会去引入另一个类<code>AsyncConfigurationSelector</code>，在该类中有一个selectImports方法。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">public String[] selectImports(AdviceMode adviceMode) &#123;</span><br><span class="line">	switch (adviceMode) &#123;</span><br><span class="line">		case PROXY:</span><br><span class="line">			return new String[] &#123;ProxyAsyncConfiguration.class.getName()&#125;;</span><br><span class="line">		case ASPECTJ:</span><br><span class="line">			return new String[] &#123;ASYNC_EXECUTION_ASPECT_CONFIGURATION_CLASS_NAME&#125;;</span><br><span class="line">		default:</span><br><span class="line">			return null;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>可以看到Spring会根据通知的模式来选择代理的方式，主要分为动态代理和静态代理。看到这你可能也就知道了，Spring异步功能的实现就是通过代理来实现的。我们打开<code>ProxyAsyncConfiguration</code>类的定义。</p>
+<p>可以看到Spring会根据通知的模式来选择代理的方式，主要分为动态代理和静态代理。看到这你可能也就知道了，Spring异步功能的实现就是通过aop来实现的。我们打开<code>ProxyAsyncConfiguration</code>类的定义。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">@Configuration(proxyBeanMethods &#x3D; false)</span><br><span class="line">@Role(BeanDefinition.ROLE_INFRASTRUCTURE)</span><br><span class="line">public class ProxyAsyncConfiguration extends AbstractAsyncConfiguration &#123;</span><br><span class="line"></span><br><span class="line">	&#x2F;**</span><br><span class="line">	 * 注入AsyncAnnotationBeanPostProcessor到容器中</span><br><span class="line">	 * @return</span><br><span class="line">	 *&#x2F;</span><br><span class="line">	@Bean(name &#x3D; TaskManagementConfigUtils.ASYNC_ANNOTATION_PROCESSOR_BEAN_NAME)</span><br><span class="line">	@Role(BeanDefinition.ROLE_INFRASTRUCTURE)</span><br><span class="line">	public AsyncAnnotationBeanPostProcessor asyncAdvisor() &#123;</span><br><span class="line">		Assert.notNull(this.enableAsync, &quot;@EnableAsync annotation metadata was not injected&quot;);</span><br><span class="line">		AsyncAnnotationBeanPostProcessor bpp &#x3D; new AsyncAnnotationBeanPostProcessor();</span><br><span class="line">		bpp.configure(this.executor, this.exceptionHandler);</span><br><span class="line">		Class&lt;? extends Annotation&gt; customAsyncAnnotation &#x3D; this.enableAsync.getClass(&quot;annotation&quot;);</span><br><span class="line">		if (customAsyncAnnotation !&#x3D; AnnotationUtils.getDefaultValue(EnableAsync.class, &quot;annotation&quot;)) &#123;</span><br><span class="line">			bpp.setAsyncAnnotationType(customAsyncAnnotation);</span><br><span class="line">		&#125;</span><br><span class="line">		bpp.setProxyTargetClass(this.enableAsync.getBoolean(&quot;proxyTargetClass&quot;));</span><br><span class="line">		bpp.setOrder(this.enableAsync.&lt;Integer&gt;getNumber(&quot;order&quot;));</span><br><span class="line">		return bpp;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>可以看到在该配置类中向容器中注入了一个<code>AsyncAnnotationBeanPostProcessor</code>，看下该类的结构图。<img src="/posts/c2c8cd86/2.png"><br>我在该类结构图中标注了两个比较重要的接口，<code>BeanFactoryAware</code>和<code>BeanPostProcessor</code>。在bean的生命周期中会对这两个接口中的方法进行调用，如果对这流程不清楚的话可以看下我这片文章<a href="../9483b875">Spring学习-bean的生命周期</a>。在<code>AsyncAnnotationBeanPostProcessor</code>中对<code>BeanFactoryAware#setBeanFactory()</code>方法进行了实现。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public void setBeanFactory(BeanFactory beanFactory) &#123;</span><br><span class="line">	super.setBeanFactory(beanFactory);</span><br><span class="line">	AsyncAnnotationAdvisor advisor &#x3D; new AsyncAnnotationAdvisor(this.executor, this.exceptionHandler);</span><br><span class="line">	if (this.asyncAnnotationType !&#x3D; null) &#123;</span><br><span class="line">		advisor.setAsyncAnnotationType(this.asyncAnnotationType);</span><br><span class="line">	&#125;</span><br><span class="line">	advisor.setBeanFactory(beanFactory);</span><br><span class="line">	this.advisor &#x3D; advisor;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -452,7 +452,7 @@
 <h2 id="异步方法的异常处理"><a href="#异步方法的异常处理" class="headerlink" title="异步方法的异常处理"></a>异步方法的异常处理</h2><p>从上面的方法中可以看到当产生了异常之后，会调用handleError方法来处理异常。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">public void handleError(Throwable ex, Method method, Object... params) throws Exception &#123;</span><br><span class="line">	&#x2F;&#x2F;返回值类型为Future</span><br><span class="line">	if (Future.class.isAssignableFrom(method.getReturnType())) &#123;</span><br><span class="line">		ReflectionUtils.rethrowException(ex);</span><br><span class="line">	&#125;</span><br><span class="line">	&#x2F;&#x2F;返回值类型为非Future</span><br><span class="line">	else &#123;</span><br><span class="line">		&#x2F;&#x2F; Could not transmit the exception to the caller with default executor</span><br><span class="line">		try &#123;</span><br><span class="line">			this.exceptionHandler.obtain().handleUncaughtException(ex, method, params);</span><br><span class="line">		&#125;</span><br><span class="line">		catch (Throwable ex2) &#123;</span><br><span class="line">			logger.warn(&quot;Exception handler for async method &#39;&quot; + method.toGenericString() +</span><br><span class="line">					&quot;&#39; threw unexpected exception itself&quot;, ex2);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>可以看到在该方法内首先对方法进行判断，判断方法的返回值是否是Future类型，如果是Future类型的话，则重新抛出异常。如果是非Future类型，会先去获取异步异常处理器。<img src="/posts/c2c8cd86/9.png"><br>可以看到该异常处理器的类型为<code>AsyncUncaughtExceptionHandler</code>，也就是如果我们需要去处理这些异常的话只需要定义一个bean并去实现该接口就行了。然后当异常产生之后，Spirng就会去调用handleUncaughtException方法来通知程序通知产生了异常。</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>在Spring中方法的异步调用是通过代理实现的，在使用<code>@EnableAsync</code>注解之后，会注册<code>AsyncAnnotationBeanPostProcessor</code>到容器中，当加载该BeanPostProcessor时会初始化对应的Advisor（执行BeanFactoryAware）。在调用被代理方法（异步方法）时会创建一个Callable对象并将MethodInvocation传入，然后提交该异步任务。在发生异常时会根据返回值的类型是否为Future来处理，如果是Future类型则重新抛出异常。如果不是Future类型，则通过<code>AsyncUncaughtExceptionHandler</code>来通知程序。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>在Spring中方法的异步调用是基于aop实现的，在使用<code>@EnableAsync</code>注解之后，会注册<code>AsyncAnnotationBeanPostProcessor</code>到容器中，当加载该BeanPostProcessor时会初始化对应的Advisor（执行BeanFactoryAware）。在调用被代理方法（异步方法）时会创建一个Callable对象并将MethodInvocation传入，然后提交该异步任务。在发生异常时会根据返回值的类型是否为Future来处理，如果是Future类型则重新抛出异常。如果不是Future类型，则通过<code>AsyncUncaughtExceptionHandler</code>来通知程序。</p>
 
       
     </div>
@@ -472,7 +472,7 @@
   <p><span>本文标题:</span><a href="/posts/c2c8cd86/">Spring异步（@Async）源码解析</a></p>
   <p><span>文章作者:</span><a href="/" title="访问 彭椿悦 的个人博客">彭椿悦</a></p>
   <p><span>发布时间:</span>2021年04月14日 - 10:04</p>
-  <p><span>最后更新:</span>2021年04月14日 - 16:04</p>
+  <p><span>最后更新:</span>2021年04月14日 - 19:04</p>
   <p><span>原始链接:</span><a href="/posts/c2c8cd86/" title="Spring异步（@Async）源码解析">http://chunyuepeng.github.io/posts/c2c8cd86/</a>
     <span class="copy-path"  title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="http://chunyuepeng.github.io/posts/c2c8cd86/"  aria-label="复制成功！"></i></span>
   </p>
@@ -539,6 +539,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/2eb81046/" rel="prev" title="Spring事务源码解析上">
+                Spring事务源码解析上 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -619,7 +623,7 @@
               
                 <a href="/archives/%7C%7C%20archive">
               
-                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-count">24</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -632,7 +636,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-count">17</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>
@@ -665,23 +669,23 @@
       
       
         <li class="recent_posts_li">
-          <a href="/posts/c2c8cd86/" title="Spring异步（@Async）源码解析" target="_blank">Spring异步（@Async）源码解析</a>
+          <a href="/posts/71b0990/" title="分布式锁-Redis实现" target="_blank">分布式锁-Redis实现</a>
         </li>
       
         <li class="recent_posts_li">
-          <a href="/posts/800ab950/" title="AOP源码解析之被切入方法调用过程" target="_blank">AOP源码解析之被切入方法调用过程</a>
+          <a href="/posts/4eb3381c/" title="分布式锁" target="_blank">分布式锁</a>
         </li>
       
         <li class="recent_posts_li">
-          <a href="/posts/47477f67/" title="AOP源码解析之代理类的生成" target="_blank">AOP源码解析之代理类的生成</a>
+          <a href="/posts/5eac0da1/" title="事务的隔离级别" target="_blank">事务的隔离级别</a>
         </li>
       
         <li class="recent_posts_li">
-          <a href="/posts/8a3989cc/" title="AOP源码解析之Advisor的加载" target="_blank">AOP源码解析之Advisor的加载</a>
+          <a href="/posts/fcb307c5/" title="Spring事务源码解析下" target="_blank">Spring事务源码解析下</a>
         </li>
       
         <li class="recent_posts_li">
-          <a href="/posts/185f54c8/" title="AOP源码解析之aop:aspectj-autoproxy标签" target="_blank">AOP源码解析之aop:aspectj-autoproxy标签</a>
+          <a href="/posts/2eb81046/" title="Spring事务源码解析上" target="_blank">Spring事务源码解析上</a>
         </li>
       
     </ul>
@@ -763,7 +767,7 @@
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">24.4k</span>
+    <span title="Site words total count">38.8k</span>
   
 </div>
 
@@ -787,7 +791,7 @@
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count">博客全站共24.4k字</span>
+  <span class="post-count">博客全站共38.8k字</span>
 </div>
 
 

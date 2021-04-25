@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="code-bQSgDzUJpU" />
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="分布式,锁," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="概述在分布式锁这篇文章中，已经介绍过了分布式锁的概念以及一个分布式锁所需要满足的条件。在本篇文章中将通过redis来实现一个简易的分布式锁。在完成一个功能时你首先得知道要求是什么，为了保证分布式锁可用，所实现的分布式锁至少需要满足以下条件：  互斥性。在任意时刻，只能有一个客户端持有锁。 避免死锁。当客户端在持有锁期间崩溃而没有主动释放锁时需要保证后续其它客户端能够获得该锁，实现该功能可以通过给锁">
+<meta property="og:type" content="article">
+<meta property="og:title" content="分布式锁-Redis实现">
+<meta property="og:url" content="http://chunyuepeng.github.io/posts/71b0990/index.html">
+<meta property="og:site_name" content="彭椿悦">
+<meta property="og:description" content="概述在分布式锁这篇文章中，已经介绍过了分布式锁的概念以及一个分布式锁所需要满足的条件。在本篇文章中将通过redis来实现一个简易的分布式锁。在完成一个功能时你首先得知道要求是什么，为了保证分布式锁可用，所实现的分布式锁至少需要满足以下条件：  互斥性。在任意时刻，只能有一个客户端持有锁。 避免死锁。当客户端在持有锁期间崩溃而没有主动释放锁时需要保证后续其它客户端能够获得该锁，实现该功能可以通过给锁">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-04-23T09:08:43.000Z">
+<meta property="article:modified_time" content="2021-04-25T02:45:50.373Z">
+<meta property="article:author" content="彭椿悦">
+<meta property="article:tag" content="分布式">
+<meta property="article:tag" content="锁">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://chunyuepeng.github.io/posts/71b0990/"/>
+
+
+
+
+
+  <title>分布式锁-Redis实现 | 彭椿悦</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband">
+	<a target="_blank" rel="noopener" href="https://github.com/ChunyuePeng/chunyuepeng.github.io" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+	</div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">彭椿悦</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            Commonweal 404
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chunyuepeng.github.io/posts/71b0990/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="彭椿悦">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="彭椿悦">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">分布式锁-Redis实现</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2021-04-23T17:08:43+08:00">
+                2021-04-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Words count in article&#58;</span>
+                
+                <span title="Words count in article">
+                  3.7k
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Reading time &asymp;</span>
+                
+                <span title="Reading time">
+                  16
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>在<a href="../4eb3381c">分布式锁</a>这篇文章中，已经介绍过了分布式锁的概念以及一个分布式锁所需要满足的条件。在本篇文章中将通过redis来实现一个简易的分布式锁。在完成一个功能时你首先得知道要求是什么，为了保证分布式锁可用，所实现的分布式锁至少需要满足以下条件：</p>
+<ul>
+<li>互斥性。在任意时刻，只能有一个客户端持有锁。</li>
+<li>避免死锁。当客户端在持有锁期间崩溃而没有主动释放锁时需要保证后续其它客户端能够获得该锁，实现该功能可以通过给锁加上一个超时时间来解决。</li>
+<li>加锁和解锁必须是相同的客户端，解锁时只能解自己加的锁。</li>
+<li>锁超时，由于业务处理时间过长，导致业务逻辑还未处理完锁就因为超过了过期时间自动释放掉了。</li>
+<li>锁可重入。客户端在外层使用锁之后，在内层仍然可以使用锁，并且不会发生死锁。</li>
+</ul>
+<h1 id="实现思路"><a href="#实现思路" class="headerlink" title="实现思路"></a>实现思路</h1><h2 id="互斥性"><a href="#互斥性" class="headerlink" title="互斥性"></a>互斥性</h2><p>解决互斥性问题，有两种方式，setNx和lua脚本来实现。</p>
+<h3 id="setNx"><a href="#setNx" class="headerlink" title="setNx"></a>setNx</h3><p>setNx即SET if NOT eXist的缩写，只有当设置的key不存在时才会设置成功，当key存在时设置key会失败。要给某一资源加锁时使用setNx命令key就为要加锁的资源，当没有客户端持有该锁时，会设置成功，设置成功之后就代表该客户端持有该锁了。当下一个客户端来获取该资源的锁时，在使用该命令时会设置失败，此时就代表获取该资源的锁失败了。这样就实现了锁的互斥性功能。</p>
+<h3 id="lua脚本实现互斥性"><a href="#lua脚本实现互斥性" class="headerlink" title="lua脚本实现互斥性"></a>lua脚本实现互斥性</h3><p>Redis从2.6之后就开始支持lua脚本，lua和事务的功能类似，可以通过lua脚本打包多个Redis命令并执行原子操作。可以编写如下一个脚本</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">if redis.call(&#39;exists&#39;, KEYS[1]) &#x3D;&#x3D; 0 then </span><br><span class="line">   redis.call(&#39;set&#39;, KEYS[1], ARGV[1]);</span><br><span class="line">   return 1;</span><br><span class="line">else</span><br><span class="line">   return 0;</span><br><span class="line">end;   </span><br></pre></td></tr></table></figure>
+<p>在该脚本中KEYS[1]就是我们要加锁的资源名，ARGV[1]是key对应的值。在该脚本中首先会去判断key是否存在，如果不存在则设置key和key的值并返回1，如果key存在直接返回0代表加锁失败。</p>
+<h2 id="避免死锁"><a href="#避免死锁" class="headerlink" title="避免死锁"></a>避免死锁</h2><p>避免死锁可以通过给锁设置一个过期时间来结果，如果客户端崩溃时没有主动释放锁的话，在过期时间之后该锁就会自动释放掉。但这可能会引发另一个问题：锁超时，就是可能业务逻辑在过期时间之后还未处理完成，这时候锁会被释放掉，这样另外的客户端就能获取到锁。导致的结果就是同时有两台客户端在执行业务逻辑，这可能会出问题。</p>
+<h3 id="setNx-1"><a href="#setNx-1" class="headerlink" title="setNx"></a>setNx</h3><p>在使用setNx是可以使用额外的参数过期时间，这样在设置时就会将key设置上过期时间，在过期时间之后就会释放掉该锁，这样其它客户端就能拿到该锁了。</p>
+<h3 id="使用lua脚本解决死锁"><a href="#使用lua脚本解决死锁" class="headerlink" title="使用lua脚本解决死锁"></a>使用lua脚本解决死锁</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">if redis.call(&#39;exists&#39;, KEYS[1]) &#x3D;&#x3D; 0 then </span><br><span class="line">   redis.call(&#39;set&#39;, KEYS[1], ARGV[2]);</span><br><span class="line">   redis.call(&#39;pexpire&#39;, KEYS[1], ARGV[2]); #设置过期时间</span><br><span class="line">   return 1;</span><br><span class="line">else</span><br><span class="line">   return 0;</span><br><span class="line">end;  </span><br></pre></td></tr></table></figure>
+<p>可以看到就是当获取到锁之后就去设置锁的过期时间，如果客户端由于崩溃没有释放掉锁这样锁在过期之后也能主动释放掉。</p>
+<h2 id="加解锁必须是同一客户端"><a href="#加解锁必须是同一客户端" class="headerlink" title="加解锁必须是同一客户端"></a>加解锁必须是同一客户端</h2><p>实现该功能可以在设置锁的时候将key锁对应的值设置为一个唯一值，在解锁时根据该值来判断该锁是不是自己申请的锁，如果是，才会释放掉该锁。</p>
+<h2 id="解决锁超时"><a href="#解决锁超时" class="headerlink" title="解决锁超时"></a>解决锁超时</h2><p>解决业务逻辑处理时间过长而导致的锁超时问题，可以在获取到锁之后，就开启一个线程（看门狗），该线程的作用就是如果业务逻辑还未处理完且锁快要过期的时候对锁进行延期。在延期时由于需要先判断该锁是不是自己加的锁，是自己加的锁才会对锁进行延期。对应了两个redis命令，所以这里也需要使用lua脚本来实现。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">if redis.call(&#39;get&#39;, KEYS[1]) &#x3D;&#x3D; ARGV[1] then </span><br><span class="line">   return redis.call(&#39;pexpire&#39;, KEYS[1], ARGV[2]);</span><br><span class="line">else return 0</span><br><span class="line">end</span><br></pre></td></tr></table></figure>
+<h2 id="锁可重入"><a href="#锁可重入" class="headerlink" title="锁可重入"></a>锁可重入</h2><p>要实现可重入功能，在申请锁时就要存储额外的信息–同一客户端（业务请求）加锁的次数。同一客户端在申请锁时会将该值加一，在释放锁时会将该值减一，当该值等于0时就代表需要释放该锁了。判断加锁的请求是不是同一客户端我们可以在加锁时存储一个唯一值，该值可以判断请求加锁的是哪个客户端（可以使用mac+jvm id+thread id）。要实现锁重入功能就需要修改我们的lua脚本，加锁时锁的value可以使用Redis中的哈希表来存储，哈希表的key是客户端加锁时的唯一标识（相当于身份证），哈希表的value是加锁的次数。如果是同一客户端在此加锁时将该值加一，解锁时将该值减一。所以我们就需要修改前面的lua脚本了。</p>
+<h3 id="加锁脚本"><a href="#加锁脚本" class="headerlink" title="加锁脚本"></a>加锁脚本</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">if (redis.call(&#39;exists&#39;, KEYS[1]) &#x3D;&#x3D; 0) then </span><br><span class="line">    redis.call(&#39;hset&#39;, KEYS[1], ARGV[2], 1); </span><br><span class="line">    redis.call(&#39;pexpire&#39;, KEYS[1], ARGV[1]);</span><br><span class="line">    return nil;</span><br><span class="line">end;</span><br><span class="line">if (redis.call(&#39;hexists&#39;, KEYS[1], ARGV[2]) &#x3D;&#x3D; 1) then</span><br><span class="line">    redis.call(&#39;hincrby&#39;, KEYS[1], ARGV[2], 1);</span><br><span class="line">    redis.call(&#39;pexpire&#39;, KEYS[1], ARGV[1]);</span><br><span class="line">    return nil;</span><br><span class="line">end;</span><br><span class="line">return redis.call(&#39;pttl&#39;, KEYS[1]);</span><br></pre></td></tr></table></figure>
+<p>介绍下脚本中传入的参数代表的含义。</p>
+<ul>
+<li>KEYS[1]：锁名称（资源名称）。</li>
+<li>ARGV[1]：锁过期时间。</li>
+<li>ARGV[2]：客户端（业务请求）的唯一标识。</li>
+</ul>
+<p>在执行脚本时会先去判断锁名称是否存在，也就是是否有客户端已经持有该锁了。如果没有客户端持有该锁那么就利用hset命令保存一个哈希表并在哈希表中设置该客户端的加锁次数为1，并设置哈希表（锁）的过期时间；如果此时已经有客户端持有锁，这会去执行第二个if语句，判断该锁是不是自己持有的，如果是则将加锁次数加一并重新设置锁的过期时间；可以看到如果执行该脚本之后返回结果为nil（空）时代表加锁成功否则代表加锁失败。</p>
+<h3 id="延时脚本"><a href="#延时脚本" class="headerlink" title="延时脚本"></a>延时脚本</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">if (redis.call(&#39;hexists&#39;, KEYS[1], ARGV[2]) &#x3D;&#x3D; 1) then</span><br><span class="line">    redis.call(&#39;pexpire&#39;, KEYS[1], ARGV[1]);</span><br><span class="line">    return 1;</span><br><span class="line">end;</span><br><span class="line">return 0;</span><br></pre></td></tr></table></figure>
+<p>该脚本中参数所代表的含义和加锁脚本中参数含义是相同的。执行脚本时会去判断自己有没有持有该锁，如果持有该锁则对锁延时。执行该脚本延时成功的返回值是1，延时失败的返回值是0。</p>
+<h3 id="解锁脚本"><a href="#解锁脚本" class="headerlink" title="解锁脚本"></a>解锁脚本</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">if (redis.call(&#39;exists&#39;, KEYS[1]) &#x3D;&#x3D; 0) then</span><br><span class="line">    redis.call(&#39;publish&#39;, KEYS[2], ARGV[1]);</span><br><span class="line">    return 1;</span><br><span class="line">end;</span><br><span class="line">if (redis.call(&#39;hexists&#39;, KEYS[1], ARGV[3]) &#x3D;&#x3D; 0) then</span><br><span class="line"> return nil;</span><br><span class="line">end;</span><br><span class="line">local counter &#x3D; redis.call(&#39;hincrby&#39;, KEYS[1], ARGV[3], -1);</span><br><span class="line">if (counter &gt; 0) then</span><br><span class="line"> redis.call(&#39;pexpire&#39;, KEYS[1], ARGV[2]);</span><br><span class="line">    return 0;</span><br><span class="line">else </span><br><span class="line"> redis.call(&#39;del&#39;, KEYS[1]);</span><br><span class="line">    redis.call(&#39;publish&#39;, KEYS[2], ARGV[1]);</span><br><span class="line">    return 1;</span><br><span class="line">end; </span><br><span class="line">return nil;</span><br></pre></td></tr></table></figure>
+<p>脚本中各参数的具体含义：</p>
+<ul>
+<li>KEYS[1]：所名称</li>
+<li>KEYS[2]：redisson_lock__channel:{锁名字}，用于锁失效时给订阅了该频道的客户端发送消息，好让客户端去竞争锁。</li>
+<li>ARGV[1]：解锁的标识符。</li>
+<li>ARGV[2]：锁过期时间。</li>
+<li>ARGV[3]：加锁的标识符。</li>
+</ul>
+<p>在执行该脚本时首先会去判断按该锁是否存在，如果不存在则通知其它客户端去竞争锁。如果锁存在则判断该锁是不是自己持有的，如果不是直接返回空。如果时自己持有的话则将加锁次数减一之后再怕判断是否该释放锁，如果加锁次数大于0的话，此时不释放锁直接将加锁次数减一。如果加锁次数等于0就代表需要真正释放该锁了。执行该脚本时返回值为1代表解锁成功，并释放掉锁了。返回值为0代表将加锁次数减一。返回值为null代表该锁不是自己所持有的。</p>
+<h1 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h1><h2 id="RedisDistributedLock-java"><a href="#RedisDistributedLock-java" class="headerlink" title="RedisDistributedLock.java"></a>RedisDistributedLock.java</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br></pre></td><td class="code"><pre><span class="line">public class RedisDistributedLock implements DistributedLock, LockPostpone &#123;</span><br><span class="line">    private Integer database &#x3D; null;</span><br><span class="line">    Logger logger &#x3D; LoggerFactory.getLogger(RedisDistributedLock.class);</span><br><span class="line">    &#x2F;**</span><br><span class="line">     * 锁默认的过期时间(单位毫秒)</span><br><span class="line">     *&#x2F;</span><br><span class="line">    private static final Long DEFAULT_EXPIRED_TIME &#x3D; 30000L;</span><br><span class="line">    &#x2F;**</span><br><span class="line">     * 是否需要开启延时线程</span><br><span class="line">     *&#x2F;</span><br><span class="line">    private boolean needPostpone &#x3D; true;</span><br><span class="line">    &#x2F;**</span><br><span class="line">     * 释放锁成功的返回结果</span><br><span class="line">     *&#x2F;</span><br><span class="line">    public static final Long RELEASE_SUCCESS &#x3D; 1L;</span><br><span class="line">    &#x2F;**</span><br><span class="line">     * 延时成功的返回结果</span><br><span class="line">     *&#x2F;</span><br><span class="line">    private static final Long POSTPONE_SUCCESS &#x3D; 1L;</span><br><span class="line">    private static Map&lt;String, Postpone&gt; postponeMap &#x3D; new ConcurrentHashMap&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    private String sourceName;</span><br><span class="line">    private String uniqueStr;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    &#x2F;**</span><br><span class="line">     * 锁前缀</span><br><span class="line">     *&#x2F;</span><br><span class="line">    static public String LOCK_PREFIX &#x3D; &quot;DCS_LOCK_&quot;;</span><br><span class="line"></span><br><span class="line">    public static final String POSTPONE_REENTRANT_LOCK_SCRIPT &#x3D;</span><br><span class="line">            &quot;if (redis.call(&#39;hexists&#39;, KEYS[1], ARGV[2]) &#x3D;&#x3D; 1) then\n&quot; +</span><br><span class="line">                    &quot;    redis.call(&#39;pexpire&#39;, KEYS[1], ARGV[1]);\n&quot; +</span><br><span class="line">                    &quot;    return 1;\n&quot; +</span><br><span class="line">                    &quot;end;\n&quot; +</span><br><span class="line">                    &quot;return 0;\n&quot;;</span><br><span class="line"></span><br><span class="line">    &#x2F;**</span><br><span class="line">     * 可重入加锁脚本，KEYS[1]：锁名字，ARGS[1]过期时间，ARGS[2]：加锁时的唯一标识</span><br><span class="line">     *&#x2F;</span><br><span class="line">    public static final String REENTRANT_LOCK_SCRIPT &#x3D;</span><br><span class="line">            &quot;if (redis.call(&#39;exists&#39;, KEYS[1]) &#x3D;&#x3D; 0) then \n&quot; +</span><br><span class="line">                    &quot;    redis.call(&#39;hset&#39;, KEYS[1], ARGV[2], 1); \n&quot; +</span><br><span class="line">                    &quot;    redis.call(&#39;pexpire&#39;, KEYS[1], ARGV[1]);\n&quot; +</span><br><span class="line">                    &quot;    return nil;\n&quot; +</span><br><span class="line">                    &quot;end;\n&quot; +</span><br><span class="line">                    &quot;if (redis.call(&#39;hexists&#39;, KEYS[1], ARGV[2]) &#x3D;&#x3D; 1) then\n&quot; +</span><br><span class="line">                    &quot;    redis.call(&#39;hincrby&#39;, KEYS[1], ARGV[2], 1);\n&quot; +</span><br><span class="line">                    &quot;    redis.call(&#39;pexpire&#39;, KEYS[1], ARGV[1]);\n&quot; +</span><br><span class="line">                    &quot;    return nil;\n&quot; +</span><br><span class="line">                    &quot;end;\n&quot; +</span><br><span class="line">                    &quot;return redis.call(&#39;pttl&#39;, KEYS[1]);\n&quot;;</span><br><span class="line">    &#x2F;**</span><br><span class="line">     * 可重入解锁脚本，KEYS[1]是锁名字</span><br><span class="line">     * KEYS[2]是 redisson_lock__channel:&#123;锁名字&#125; 这么一个东西，他其实也是个key，可以理解为主题， 发布订阅用的</span><br><span class="line">     * ARGV[1]是解锁的标识符</span><br><span class="line">     * ARGV[2] 过期时间</span><br><span class="line">     * ARGV[3] 加锁时的唯一标识</span><br><span class="line">     *&#x2F;</span><br><span class="line">    public static final String REENTRANT_UNLOCK_SCRIPT &#x3D;</span><br><span class="line">            &quot;if (redis.call(&#39;exists&#39;, KEYS[1]) &#x3D;&#x3D; 0) then\n&quot; +</span><br><span class="line">                    &quot;    redis.call(&#39;publish&#39;, KEYS[2], ARGV[1]);\n&quot; +</span><br><span class="line">                    &quot;    return 1;\n&quot; +</span><br><span class="line">                    &quot;end;\n&quot; +</span><br><span class="line">                    &quot;if (redis.call(&#39;hexists&#39;, KEYS[1], ARGV[3]) &#x3D;&#x3D; 0) then\n&quot; +</span><br><span class="line">                    &quot; return nil;\n&quot; +</span><br><span class="line">                    &quot;end;\n&quot; +</span><br><span class="line">                    &quot;local counter &#x3D; redis.call(&#39;hincrby&#39;, KEYS[1], ARGV[3], -1);\n&quot; +</span><br><span class="line">                    &quot;if (counter &gt; 0) then\n&quot; +</span><br><span class="line">                    &quot; redis.call(&#39;pexpire&#39;, KEYS[1], ARGV[2]);\n&quot; +</span><br><span class="line">                    &quot;    return 0;\n&quot; +</span><br><span class="line">                    &quot;else \n&quot; +</span><br><span class="line">                    &quot; redis.call(&#39;del&#39;, KEYS[1]);\n&quot; +</span><br><span class="line">                    &quot;    redis.call(&#39;publish&#39;, KEYS[2], ARGV[1]);\n&quot; +</span><br><span class="line">                    &quot;    return 1;\n&quot; +</span><br><span class="line">                    &quot;end; \n&quot; +</span><br><span class="line">                    &quot;return nil;\n&quot;;</span><br><span class="line">    private JedisPool pool;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    public RedisDistributedLock(String sourceName, String clientId, JedisPool jedisPool, Integer database) &#123;</span><br><span class="line">        this.sourceName &#x3D; sourceName;</span><br><span class="line">        this.uniqueStr &#x3D; clientId;</span><br><span class="line">        this.pool &#x3D; jedisPool;</span><br><span class="line">        this.database &#x3D; database;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public Boolean tryLock() &#123;</span><br><span class="line">        return this.tryLock(DEFAULT_EXPIRED_TIME);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public Boolean lock() &#123;</span><br><span class="line">        return lock(DEFAULT_EXPIRED_TIME);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public Boolean tryLock(int timeout) &#123;</span><br><span class="line">        return tryLock(DEFAULT_EXPIRED_TIME, timeout);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public Boolean tryLock(Long expireTime) &#123;</span><br><span class="line">        Boolean locked &#x3D; false;</span><br><span class="line">        while (true) &#123;</span><br><span class="line">            locked &#x3D; setValueIfAbsent(LOCK_PREFIX + sourceName, uniqueStr, expireTime);</span><br><span class="line">            if (locked) &#123;</span><br><span class="line">                if (logger.isDebugEnabled()) &#123;</span><br><span class="line">                    logger.debug(uniqueStr + &quot;获取到了锁&quot;);</span><br><span class="line">                &#125;</span><br><span class="line">                break;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        &#x2F;&#x2F;如果获取锁成功则启动一个延时线程</span><br><span class="line">        if (locked &amp;&amp; needPostpone()) &#123;</span><br><span class="line">            startPostponeThread(expireTime);</span><br><span class="line">        &#125;</span><br><span class="line">        return Boolean.TRUE;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public Boolean lock(Long expireTime) &#123;</span><br><span class="line">        Boolean locked &#x3D; setValueIfAbsent(LOCK_PREFIX + sourceName, uniqueStr, expireTime);</span><br><span class="line">        &#x2F;&#x2F;如果获取锁成功则启动一个延时线程</span><br><span class="line">        if (locked &amp;&amp; needPostpone()) &#123;</span><br><span class="line">            startPostponeThread(expireTime);</span><br><span class="line">        &#125;</span><br><span class="line">        if (!locked) &#123;</span><br><span class="line">            if (logger.isDebugEnabled()) &#123;</span><br><span class="line">                logger.debug(uniqueStr + &quot;未获取到锁&quot;);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            if (logger.isDebugEnabled()) &#123;</span><br><span class="line">                logger.debug(uniqueStr + &quot;获取到了锁&quot;);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        return locked;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    &#x2F;**</span><br><span class="line">     * 设置锁</span><br><span class="line">     *</span><br><span class="line">     * @param key</span><br><span class="line">     * @param value</span><br><span class="line">     * @param expireTime</span><br><span class="line">     * @return</span><br><span class="line">     *&#x2F;</span><br><span class="line">    public Boolean setValueIfAbsent(String key, String value, Long expireTime) &#123;</span><br><span class="line">        Jedis jedis &#x3D; pool.getResource();</span><br><span class="line">        if (database !&#x3D; null) &#123;</span><br><span class="line">            jedis.select(0);</span><br><span class="line">        &#125;</span><br><span class="line">        Object result;</span><br><span class="line">        try &#123;</span><br><span class="line">            result &#x3D; jedis.eval(REENTRANT_LOCK_SCRIPT, Lists.newArrayList(key), Lists.newArrayList(String.valueOf(expireTime),</span><br><span class="line">                    value));</span><br><span class="line">        &#125; finally &#123;</span><br><span class="line">            jedis.close();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        return result &#x3D;&#x3D; null;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public Boolean tryLock(Long expireTime, int timeout) &#123;</span><br><span class="line">        Boolean locked &#x3D; false;</span><br><span class="line">        long begin &#x3D; System.currentTimeMillis();</span><br><span class="line">        while ((System.currentTimeMillis() - begin) &lt;&#x3D; timeout) &#123;</span><br><span class="line">            locked &#x3D; setValueIfAbsent(LOCK_PREFIX + sourceName, uniqueStr, expireTime);</span><br><span class="line">            if (locked) &#123;</span><br><span class="line">                if (logger.isDebugEnabled()) &#123;</span><br><span class="line">                    logger.debug(uniqueStr + &quot;获取到了锁&quot;);</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                break;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        &#x2F;&#x2F;如果获取锁成功则启动一个延时线程</span><br><span class="line">        if (locked &amp;&amp; needPostpone()) &#123;</span><br><span class="line">            startPostponeThread(expireTime);</span><br><span class="line">        &#125;</span><br><span class="line">        if (!locked) &#123;</span><br><span class="line">            if (logger.isDebugEnabled()) &#123;</span><br><span class="line">                logger.debug(uniqueStr + &quot;未获取到锁&quot;);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        return locked;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    private void startPostponeThread(Long expireTime) &#123;</span><br><span class="line">        if (postponeMap.get(uniqueStr) !&#x3D; null) &#123;</span><br><span class="line">            return;</span><br><span class="line">        &#125;</span><br><span class="line">        &#x2F;&#x2F;如果获取到锁了，启动一个延时线程，防止业务逻辑未执行完毕就因锁超时而使锁释放</span><br><span class="line">        Postpone postpone &#x3D; new DefaultPostpone();</span><br><span class="line">        postponeMap.put(uniqueStr, postpone);</span><br><span class="line">        Thread postponeThread &#x3D; new Thread(new PostponeTask(uniqueStr, expireTime,</span><br><span class="line">                this, postpone));</span><br><span class="line">        &#x2F;&#x2F;将该线程设置为守护线程</span><br><span class="line">        postponeThread.setDaemon(Boolean.TRUE);</span><br><span class="line">        postponeThread.start();</span><br><span class="line">        if (logger.isDebugEnabled()) &#123;</span><br><span class="line">            logger.debug(&quot;为&quot; + uniqueStr + &quot;开启了延时线程&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public Boolean unlock() &#123;</span><br><span class="line">        Jedis jedis &#x3D; pool.getResource();</span><br><span class="line">        if (database !&#x3D; null) &#123;</span><br><span class="line">            jedis.select(0);</span><br><span class="line">        &#125;</span><br><span class="line">        Object result;</span><br><span class="line">        try &#123;</span><br><span class="line">            result &#x3D; jedis.eval(REENTRANT_UNLOCK_SCRIPT, Lists.newArrayList(LOCK_PREFIX + sourceName,</span><br><span class="line">                    &quot;redisson_lock__channel:&#123;&quot; + LOCK_PREFIX + sourceName + &quot;&#125;&quot;), Lists.newArrayList(uniqueStr,</span><br><span class="line">                    String.valueOf(DEFAULT_EXPIRED_TIME), uniqueStr));</span><br><span class="line">        &#125; finally &#123;</span><br><span class="line">            jedis.close();</span><br><span class="line">        &#125;</span><br><span class="line">        if (RELEASE_SUCCESS.equals(result)) &#123;</span><br><span class="line">            &#x2F;&#x2F;通知守护线程关闭</span><br><span class="line">            Postpone postpone &#x3D; postponeMap.get(uniqueStr);</span><br><span class="line">            if (postpone !&#x3D; null) &#123;</span><br><span class="line">                postpone.stopPostPone();</span><br><span class="line">                postponeMap.remove(uniqueStr);</span><br><span class="line">            &#125;</span><br><span class="line">            if (logger.isDebugEnabled()) &#123;</span><br><span class="line">                logger.debug(uniqueStr + &quot;释放了锁&quot;);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            return Boolean.TRUE;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            if (logger.isDebugEnabled()) &#123;</span><br><span class="line">                logger.debug(uniqueStr + &quot;未释放锁&quot;);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            return Boolean.FALSE;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public Boolean postpone(long expireTime) &#123;</span><br><span class="line">        Jedis jedis &#x3D; pool.getResource();</span><br><span class="line">        if (database !&#x3D; null) &#123;</span><br><span class="line">            jedis.select(0);</span><br><span class="line">        &#125;</span><br><span class="line">        try &#123;</span><br><span class="line">            Object result &#x3D; jedis.eval(POSTPONE_REENTRANT_LOCK_SCRIPT, Lists.newArrayList(LOCK_PREFIX + sourceName),</span><br><span class="line">                    Lists.newArrayList(String.valueOf(expireTime), uniqueStr</span><br><span class="line">                    ));</span><br><span class="line">            if (POSTPONE_SUCCESS.equals(result)) &#123;</span><br><span class="line">                return Boolean.TRUE;</span><br><span class="line">            &#125;</span><br><span class="line">            return Boolean.FALSE;</span><br><span class="line">        &#125; finally &#123;</span><br><span class="line">            jedis.close();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public boolean needPostpone() &#123;</span><br><span class="line">        return needPostpone;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="PostponeTask-java"><a href="#PostponeTask-java" class="headerlink" title="PostponeTask.java"></a>PostponeTask.java</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line">public class PostponeTask implements Runnable &#123;</span><br><span class="line"></span><br><span class="line">    &#x2F;**</span><br><span class="line">     * 锁名所对应的值</span><br><span class="line">     *&#x2F;</span><br><span class="line">    private String value;</span><br><span class="line">    &#x2F;**</span><br><span class="line">     * 设置的过期时间</span><br><span class="line">     *&#x2F;</span><br><span class="line">    private long expireTime;</span><br><span class="line">    private Postpone postPone;</span><br><span class="line">    private DistributedLock distributedLock;</span><br><span class="line">    Logger logger &#x3D; LoggerFactory.getLogger(PostponeTask.class);</span><br><span class="line"></span><br><span class="line">    public PostponeTask(String value, long expireTime, DistributedLock distributedLock, Postpone postPone) &#123;</span><br><span class="line">        this.value &#x3D; value;</span><br><span class="line">        this.expireTime &#x3D; expireTime;</span><br><span class="line">        this.distributedLock &#x3D; distributedLock;</span><br><span class="line">        this.postPone &#x3D; postPone;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void run() &#123;</span><br><span class="line">        &#x2F;&#x2F;等待waitTime之后对锁续期</span><br><span class="line">        long waitTime &#x3D; expireTime * 2 &#x2F; 3;</span><br><span class="line">        while (!postPone.needStopPostPone()) &#123;</span><br><span class="line">            try &#123;</span><br><span class="line">                Thread.sleep(waitTime);</span><br><span class="line">                if (postPone.needStopPostPone()) &#123;</span><br><span class="line">                    break;</span><br><span class="line">                &#125;</span><br><span class="line">                &#x2F;&#x2F;延时成功</span><br><span class="line">                if (distributedLock.postpone(expireTime)) &#123;</span><br><span class="line">                    if (logger.isDebugEnabled()) &#123;</span><br><span class="line">                        logger.debug(value + &quot;延期成功&quot;);</span><br><span class="line">                    &#125;</span><br><span class="line"></span><br><span class="line">                &#125;</span><br><span class="line">                &#x2F;&#x2F;延时失败</span><br><span class="line">                else &#123;</span><br><span class="line">                    if (logger.isDebugEnabled()) &#123;</span><br><span class="line">                        logger.debug(value + &quot;延期失败&quot;);</span><br><span class="line">                    &#125;</span><br><span class="line"></span><br><span class="line">                    break;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; catch (InterruptedException e) &#123;</span><br><span class="line">                logger.error(e.getMessage());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        if (logger.isDebugEnabled()) &#123;</span><br><span class="line">            logger.debug(&quot;关闭了&quot; + value + &quot;的延时线程&quot;);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><a target="_blank" rel="noopener" href="https://github.com/ChunyuePeng/redigrandson-spring-boot-starter">完整代码地址</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    <div>
+      
+        
+<div class="my_post_copyright">
+  <script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+  
+  <!-- JS库 sweetalert 可修改路径 -->
+  <script src="https://cdn.bootcss.com/jquery/2.0.0/jquery.min.js"></script>
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+  <p><span>本文标题:</span><a href="/posts/71b0990/">分布式锁-Redis实现</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 彭椿悦 的个人博客">彭椿悦</a></p>
+  <p><span>发布时间:</span>2021年04月23日 - 17:04</p>
+  <p><span>最后更新:</span>2021年04月25日 - 10:04</p>
+  <p><span>原始链接:</span><a href="/posts/71b0990/" title="分布式锁-Redis实现">http://chunyuepeng.github.io/posts/71b0990/</a>
+    <span class="copy-path"  title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="http://chunyuepeng.github.io/posts/71b0990/"  aria-label="复制成功！"></i></span>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者。</p>  
+</div>
+<script> 
+    var clipboard = new Clipboard('.fa-clipboard');
+	  $(".fa-clipboard").click(function(){
+      clipboard.on('success', function(){
+        swal({   
+          title: "",   
+          text: '复制成功',
+          icon: "success", 
+          showConfirmButton: true
+          });
+	    });
+    });  
+</script>
+
+
+      
+    </div>
+
+    
+
+    
+
+    
+	<div>
+      
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F/" rel="tag"><i class="fa fa-tag"></i> 分布式</a>
+          
+            <a href="/tags/%E9%94%81/" rel="tag"><i class="fa fa-tag"></i> 锁</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/4eb3381c/" rel="next" title="分布式锁">
+                <i class="fa fa-chevron-left"></i> 分布式锁
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.gif"
+                alt="彭椿悦" />
+            
+              <p class="site-author-name" itemprop="name">彭椿悦</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">24</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:1399068529@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+		  
+
+  <div class="links-of-blogroll motion-element links-of-blogroll-block">
+    <div class="links-of-blogroll-title">
+      <!-- modify icon to fire by szw -->
+      <i class="fa fa-history fa-" aria-hidden="true"></i>
+      近期文章
+    </div>
+    <ul class="links-of-blogroll-list">
+      
+      
+        <li class="recent_posts_li">
+          <a href="/posts/71b0990/" title="分布式锁-Redis实现" target="_blank">分布式锁-Redis实现</a>
+        </li>
+      
+        <li class="recent_posts_li">
+          <a href="/posts/4eb3381c/" title="分布式锁" target="_blank">分布式锁</a>
+        </li>
+      
+        <li class="recent_posts_li">
+          <a href="/posts/5eac0da1/" title="事务的隔离级别" target="_blank">事务的隔离级别</a>
+        </li>
+      
+        <li class="recent_posts_li">
+          <a href="/posts/fcb307c5/" title="Spring事务源码解析下" target="_blank">Spring事务源码解析下</a>
+        </li>
+      
+        <li class="recent_posts_li">
+          <a href="/posts/2eb81046/" title="Spring事务源码解析上" target="_blank">Spring事务源码解析上</a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://developer.apple.com/swift/" title="Swift 4" target="_blank">Swift 4</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://developer.apple.com/documentation/objectivec" title="Objective-C" target="_blank">Objective-C</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A6%82%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E6%80%9D%E8%B7%AF"><span class="nav-number">2.</span> <span class="nav-text">实现思路</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%92%E6%96%A5%E6%80%A7"><span class="nav-number">2.1.</span> <span class="nav-text">互斥性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#setNx"><span class="nav-number">2.1.1.</span> <span class="nav-text">setNx</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#lua%E8%84%9A%E6%9C%AC%E5%AE%9E%E7%8E%B0%E4%BA%92%E6%96%A5%E6%80%A7"><span class="nav-number">2.1.2.</span> <span class="nav-text">lua脚本实现互斥性</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%81%BF%E5%85%8D%E6%AD%BB%E9%94%81"><span class="nav-number">2.2.</span> <span class="nav-text">避免死锁</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#setNx-1"><span class="nav-number">2.2.1.</span> <span class="nav-text">setNx</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8lua%E8%84%9A%E6%9C%AC%E8%A7%A3%E5%86%B3%E6%AD%BB%E9%94%81"><span class="nav-number">2.2.2.</span> <span class="nav-text">使用lua脚本解决死锁</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A0%E8%A7%A3%E9%94%81%E5%BF%85%E9%A1%BB%E6%98%AF%E5%90%8C%E4%B8%80%E5%AE%A2%E6%88%B7%E7%AB%AF"><span class="nav-number">2.3.</span> <span class="nav-text">加解锁必须是同一客户端</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E9%94%81%E8%B6%85%E6%97%B6"><span class="nav-number">2.4.</span> <span class="nav-text">解决锁超时</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%94%81%E5%8F%AF%E9%87%8D%E5%85%A5"><span class="nav-number">2.5.</span> <span class="nav-text">锁可重入</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8A%A0%E9%94%81%E8%84%9A%E6%9C%AC"><span class="nav-number">2.5.1.</span> <span class="nav-text">加锁脚本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BB%B6%E6%97%B6%E8%84%9A%E6%9C%AC"><span class="nav-number">2.5.2.</span> <span class="nav-text">延时脚本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A3%E9%94%81%E8%84%9A%E6%9C%AC"><span class="nav-number">2.5.3.</span> <span class="nav-text">解锁脚本</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0"><span class="nav-number">3.</span> <span class="nav-text">代码实现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#RedisDistributedLock-java"><span class="nav-number">3.1.</span> <span class="nav-text">RedisDistributedLock.java</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PostponeTask-java"><span class="nav-number">3.2.</span> <span class="nav-text">PostponeTask.java</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">彭椿悦</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">38.8k</span>
+  
+</div>
+
+
+  <div class="powered-by">
+    <i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
+    本站访客数:<span id="busuanzi_value_site_uv"></span>
+    </span>
+  </div>
+
+
+
+<!--
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+-->
+
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count">博客全站共38.8k字</span>
+</div>
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>
