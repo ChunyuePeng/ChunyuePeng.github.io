@@ -78,7 +78,7 @@
 
 
 
-  <meta name="keywords" content="Spring,IoC," />
+  <meta name="keywords" content="Redis,Redis集群," />
 
 
 
@@ -89,19 +89,28 @@
 
 
 
-<meta name="description" content="简介见名知意，我们可以知道invokeBeanFactoryPostProcessors方法的作用就是调用BeanFactoryPostProcessors接口的实现类，BeanFactoryPostProcessor接口与BeanPostProcessor接口类似，可以对bean信息（配置元数据）进行处理。 BeanFactoryPostProcessor使用Beans.xml123456789">
+<meta name="description" content="概述在Redis集群-主从模式文章中，我们介绍了主从复制模式。主从复制模式主要有下面两个缺点：  当主数据库(Master)宕机之后，无法自动实现从主服务器切换，需要人工进行切换，会造成一定时间内不可用。 当Redis集群中节点数量到达上限之后，扩容比较困难。  为了解决上面从主服务器自动切换问题，Redis提供了哨兵模式。你可以将哨兵模式当成主从复制的一个plus版本，能够在主服务器宕机之后通过">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Spring学习-refresh方法之invokeBeanFactoryPostProcessors">
-<meta property="og:url" content="http://chunyuepeng.github.io/posts/4f99d2fa/index.html">
+<meta property="og:title" content="Redis集群-哨兵模式">
+<meta property="og:url" content="http://chunyuepeng.github.io/posts/df693a19/index.html">
 <meta property="og:site_name" content="彭椿悦">
-<meta property="og:description" content="简介见名知意，我们可以知道invokeBeanFactoryPostProcessors方法的作用就是调用BeanFactoryPostProcessors接口的实现类，BeanFactoryPostProcessor接口与BeanPostProcessor接口类似，可以对bean信息（配置元数据）进行处理。 BeanFactoryPostProcessor使用Beans.xml123456789">
+<meta property="og:description" content="概述在Redis集群-主从模式文章中，我们介绍了主从复制模式。主从复制模式主要有下面两个缺点：  当主数据库(Master)宕机之后，无法自动实现从主服务器切换，需要人工进行切换，会造成一定时间内不可用。 当Redis集群中节点数量到达上限之后，扩容比较困难。  为了解决上面从主服务器自动切换问题，Redis提供了哨兵模式。你可以将哨兵模式当成主从复制的一个plus版本，能够在主服务器宕机之后通过">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2021-03-31T03:45:42.000Z">
-<meta property="article:modified_time" content="2021-04-07T08:38:31.852Z">
+<meta property="og:image" content="http://chunyuepeng.github.io/posts/df693a19/1.png">
+<meta property="og:image" content="http://chunyuepeng.github.io/posts/df693a19/2.png">
+<meta property="og:image" content="http://chunyuepeng.github.io/posts/df693a19/3.png">
+<meta property="og:image" content="http://chunyuepeng.github.io/posts/df693a19/4.png">
+<meta property="og:image" content="http://chunyuepeng.github.io/posts/df693a19/5.png">
+<meta property="og:image" content="http://chunyuepeng.github.io/posts/df693a19/6.png">
+<meta property="og:image" content="http://chunyuepeng.github.io/posts/df693a19/7.png">
+<meta property="og:image" content="http://chunyuepeng.github.io/posts/df693a19/8.png">
+<meta property="article:published_time" content="2021-04-25T08:38:39.000Z">
+<meta property="article:modified_time" content="2021-04-25T10:22:58.589Z">
 <meta property="article:author" content="彭椿悦">
-<meta property="article:tag" content="Spring">
-<meta property="article:tag" content="IoC">
+<meta property="article:tag" content="Redis">
+<meta property="article:tag" content="Redis集群">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://chunyuepeng.github.io/posts/df693a19/1.png">
 
 
 
@@ -131,13 +140,13 @@
 
 
 
-  <link rel="canonical" href="http://chunyuepeng.github.io/posts/4f99d2fa/"/>
+  <link rel="canonical" href="http://chunyuepeng.github.io/posts/df693a19/"/>
 
 
 
 
 
-  <title>Spring学习-refresh方法之invokeBeanFactoryPostProcessors | 彭椿悦</title>
+  <title>Redis集群-哨兵模式 | 彭椿悦</title>
   
 
 
@@ -310,7 +319,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://chunyuepeng.github.io/posts/4f99d2fa/">
+    <link itemprop="mainEntityOfPage" href="http://chunyuepeng.github.io/posts/df693a19/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="彭椿悦">
@@ -327,7 +336,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Spring学习-refresh方法之invokeBeanFactoryPostProcessors</h1>
+          <h1 class="post-title" itemprop="name headline">Redis集群-哨兵模式</h1>
         
 
         <div class="post-meta">
@@ -339,8 +348,8 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2021-03-31T11:45:42+08:00">
-                2021-03-31
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2021-04-25T16:38:39+08:00">
+                2021-04-25
               </time>
             
 
@@ -371,7 +380,7 @@
                   <span class="post-meta-item-text">Words count in article&#58;</span>
                 
                 <span title="Words count in article">
-                  836
+                  1.1k
                 </span>
               
 
@@ -387,7 +396,7 @@
                   <span class="post-meta-item-text">Reading time &asymp;</span>
                 
                 <span title="Reading time">
-                  4
+                  3
                 </span>
               
             </div>
@@ -408,16 +417,82 @@
       
 
       
-        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>见名知意，我们可以知道<code>invokeBeanFactoryPostProcessors</code>方法的作用就是调用BeanFactoryPostProcessors接口的实现类，BeanFactoryPostProcessor接口与BeanPostProcessor接口类似，可以对bean信息（配置元数据）进行处理。</p>
-<h1 id="BeanFactoryPostProcessor使用"><a href="#BeanFactoryPostProcessor使用" class="headerlink" title="BeanFactoryPostProcessor使用"></a>BeanFactoryPostProcessor使用</h1><h2 id="Beans-xml"><a href="#Beans-xml" class="headerlink" title="Beans.xml"></a>Beans.xml</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version&#x3D;&quot;1.0&quot; encoding&#x3D;&quot;UTF-8&quot;?&gt;</span><br><span class="line">&lt;beans xmlns&#x3D;&quot;http:&#x2F;&#x2F;www.springframework.org&#x2F;schema&#x2F;beans&quot;</span><br><span class="line">       xmlns:xsi&#x3D;&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2001&#x2F;XMLSchema-instance&quot;</span><br><span class="line">       xsi:schemaLocation&#x3D;&quot;http:&#x2F;&#x2F;www.springframework.org&#x2F;schema&#x2F;beans</span><br><span class="line">    http:&#x2F;&#x2F;www.springframework.org&#x2F;schema&#x2F;beans&#x2F;spring-beans-3.0.xsd&quot;&gt;</span><br><span class="line">    &lt;bean id&#x3D;&quot;a&quot; class&#x3D;&quot;pcy.InstantiationAwareBeanPostProcessor.A&quot; init-method&#x3D;&quot;initMethod&quot;&gt;</span><br><span class="line">		&lt;property name&#x3D;&quot;name&quot; value&#x3D;&quot;悦哥哥&quot;&#x2F;&gt;</span><br><span class="line">    &lt;&#x2F;bean&gt;</span><br><span class="line">	&lt;bean class&#x3D;&quot;pcy.InstantiationAwareBeanPostProcessor.MyInstantiationAwareBeanPostProcessor&quot;&#x2F;&gt;</span><br><span class="line">    &lt;bean class&#x3D;&quot;pcy.beanFactoryPostProcessor.CustomBeanFactoryPostProcessor&quot;&#x2F;&gt;</span><br><span class="line">&lt;&#x2F;beans&gt;</span><br></pre></td></tr></table></figure>
-<h2 id="CustomBeanFactoryPostProcessor-java"><a href="#CustomBeanFactoryPostProcessor-java" class="headerlink" title="CustomBeanFactoryPostProcessor,java"></a>CustomBeanFactoryPostProcessor,java</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public class CustomBeanFactoryPostProcessor implements BeanFactoryPostProcessor &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException &#123;</span><br><span class="line">        System.out.println(&quot;enter into postProcessBeanFactory&quot;);</span><br><span class="line">        BeanDefinition be &#x3D; beanFactory.getBeanDefinition(&quot;a&quot;);</span><br><span class="line">        &#x2F;&#x2F;获取到beanDefinition之后你可以对其进行修改等操作，例如你可以在配置文件中对数据库连接密码进行加密，</span><br><span class="line">        &#x2F;&#x2F;在此进行解密。</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="Test-java"><a href="#Test-java" class="headerlink" title="Test.java"></a>Test.java</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public class Test &#123;</span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">		ApplicationContext context &#x3D; new ClassPathXmlApplicationContext(&quot;Beans.xml&quot;);</span><br><span class="line">		A a &#x3D; (A) context.getBean(&quot;a&quot;);</span><br><span class="line">		System.out.println(a.getName());</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="运行结果"><a href="#运行结果" class="headerlink" title="运行结果"></a>运行结果</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">enter into postProcessBeanFactory</span><br><span class="line">A被实例化</span><br></pre></td></tr></table></figure>
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>我们进入<code>invokeBeanFactoryPostProcessors()</code>方法</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">protected void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory) &#123;</span><br><span class="line">	PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(beanFactory, getBeanFactoryPostProcessors());(1)</span><br><span class="line"></span><br><span class="line">	&#x2F;&#x2F; Detect a LoadTimeWeaver and prepare for weaving, if found in the meantime</span><br><span class="line">	&#x2F;&#x2F; (e.g. through an @Bean method registered by ConfigurationClassPostProcessor)</span><br><span class="line">	if (!IN_NATIVE_IMAGE &amp;&amp; beanFactory.getTempClassLoader() &#x3D;&#x3D; null &amp;&amp; beanFactory.containsBean(LOAD_TIME_WEAVER_BEAN_NAME)) &#123;</span><br><span class="line">		beanFactory.addBeanPostProcessor(new LoadTimeWeaverAwareProcessor(beanFactory));</span><br><span class="line">		beanFactory.setTempClassLoader(new ContextTypeMatchClassLoader(beanFactory.getBeanClassLoader()));</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>从(1)我们可以知道BeanFactoryPostProcessor是在这里被调用的那么，那么这些BeanFactoryProcessor在哪里被加载进去的呢？通过debug得知，当执行<code>getBeanFactoryPostProcessor()</code>方法时，返回的其实是一个空数组，那么代表CustomBeanFactoryPostProcessor此时还并未加载到到容器当中。所以说我们自定义的CustomBeanFactoryPostProcessor并不是在此方法之前创建的，通过进入<code>PostProcessorRegistrationDelegate#invokeBeanFactoryPostProcessors()</code>方法（省略了一些不重要的过程）。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">public static void invokeBeanFactoryPostProcessors(</span><br><span class="line">		ConfigurableListableBeanFactory beanFactory, List&lt;BeanFactoryPostProcessor&gt; beanFactoryPostProcessors) &#123;</span><br><span class="line"></span><br><span class="line">	&#x2F;&#x2F; Invoke BeanDefinitionRegistryPostProcessors first, if any.</span><br><span class="line">	Set&lt;String&gt; processedBeans &#x3D; new HashSet&lt;&gt;();</span><br><span class="line">	&#x2F;*xxx: 首先处理 所有的BeanDefinitionRegistryPostProcessors工厂后置处理器接口*&#x2F;</span><br><span class="line">	.....</span><br><span class="line">	String[] postProcessorNames &#x3D; beanFactory.getBeanNamesForType(BeanFactoryPostProcessor.class, true, false);(1)</span><br><span class="line"></span><br><span class="line">	.....</span><br><span class="line">	List&lt;BeanFactoryPostProcessor&gt; nonOrderedPostProcessors &#x3D; new ArrayList&lt;&gt;(nonOrderedPostProcessorNames.size());</span><br><span class="line">	for (String postProcessorName : nonOrderedPostProcessorNames) &#123;</span><br><span class="line">		&#x2F;&#x2F;在这会根据bean name去获取BeanFactoryPostProcessor bean对象，此时容器中肯定是还没有此bean对象的，</span><br><span class="line">		&#x2F;&#x2F;所以说这里其实是先去创建BeanFactoryPostProcessor的bean对象</span><br><span class="line">		nonOrderedPostProcessors.add(beanFactory.getBean(postProcessorName, BeanFactoryPostProcessor.class));(2)</span><br><span class="line">	&#125;</span><br><span class="line">	invokeBeanFactoryPostProcessors(nonOrderedPostProcessors, beanFactory);(3)</span><br><span class="line">	&#x2F;&#x2F; Clear cached merged bean definitions since the post-processors might have</span><br><span class="line">	&#x2F;&#x2F; modified the original metadata, e.g. replacing placeholders in values...</span><br><span class="line">	beanFactory.clearMetadataCache();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>在此方法中有三行非常重要的代码，也就是(1)-(3)这三行代码。执行代码(1)后，会从bean工厂找到所有实现<code>BeanFactoryPostProcessor</code>接口的实现类的beanname，在此例子中返回的是：pcy.beanFactoryPostProcessor.CustomBeanFactoryPostProcessor#0，然后看代码(2)，在这里会从beanFactory中获取我们实现类的bean对象，此时beanFactory是没有此bean对象的，此时回去创建我们的bean对象。所以，自定义的BeanFactoryPostProcessor是在这里被加载到context中的。然后就是调用代码(3)，也就执行了我们实现类的方法了。</p>
+        <h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>在<a href="../b0e0aa">Redis集群-主从模式</a>文章中，我们介绍了主从复制模式。主从复制模式主要有下面两个缺点：</p>
+<ul>
+<li>当主数据库(Master)宕机之后，无法自动实现从主服务器切换，需要人工进行切换，会造成一定时间内不可用。</li>
+<li>当Redis集群中节点数量到达上限之后，扩容比较困难。</li>
+</ul>
+<p>为了解决上面从主服务器自动切换问题，Redis提供了哨兵模式。你可以将哨兵模式当成主从复制的一个plus版本，能够在主服务器宕机之后通过一定的方式选出新的主服务器并重新提供服务。</p>
+<h1 id="哨兵模式"><a href="#哨兵模式" class="headerlink" title="哨兵模式"></a>哨兵模式</h1><p>所谓的哨兵其实就是一个进程，该进程主要有两个作用：</p>
+<ul>
+<li>通过发送命令，让Redis服务器返回其运行状态。</li>
+<li>当Master宕机时，会自动将slave切换成Master，然后通过发布订阅模式通知其它服务器修改配置文件，切换Master服务器。</li>
+</ul>
+<p>通过哨兵进程的数量可以分为单哨兵模式和多哨兵模式。</p>
+<h2 id="单哨兵模式"><a href="#单哨兵模式" class="headerlink" title="单哨兵模式"></a>单哨兵模式</h2><p><img src="/posts/df693a19/1.png" alt="单哨兵模式"></p>
+<h2 id="多哨兵模式"><a href="#多哨兵模式" class="headerlink" title="多哨兵模式"></a>多哨兵模式</h2><p>为了避免单点故障，我们通常不会使用单哨兵模式。在多哨兵模式中，哨兵除了会去监控服务器外还会对哨兵进行监控。<img src="/posts/df693a19/2.png" alt="多哨兵模式"><br>在此模式下，当哨兵检测到Master宕机时不会马上去进行重新选举和故障转移，当只有一个哨兵认为Master下线，这种现象被称为主观下线。有可能是由于网络原因导致的假下线，只有当大多数哨兵都检测到Master下线之后，才会对剩余的Slave服务器进行选举投票，推选出新的Master，投票的过程由某一个哨兵完成。当选举处新的主机之后，就会该服务器切换为Master，并通知其它Slave服务器修改配置文件，切换Master服务器。</p>
+<h1 id="哨兵模式配置"><a href="#哨兵模式配置" class="headerlink" title="哨兵模式配置"></a>哨兵模式配置</h1><p>在我们的例子中使用三个哨兵和一台Master两台Salve Redis服务器来实现。</p>
+<table>
+<thead>
+<tr>
+<th>进程类型</th>
+<th>是否为主服务器</th>
+<th>ip</th>
+<th>端口</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Redis</td>
+<td>是</td>
+<td>127.0.0.1</td>
+<td>6380</td>
+</tr>
+<tr>
+<td>Redis</td>
+<td>否</td>
+<td>127.0.0.1</td>
+<td>6381</td>
+</tr>
+<tr>
+<td>Redis</td>
+<td>否</td>
+<td>127.0.0.1</td>
+<td>6382</td>
+</tr>
+<tr>
+<td>Sentinel</td>
+<td>/</td>
+<td>127.0.0.1</td>
+<td>26380</td>
+</tr>
+<tr>
+<td>Sentinel</td>
+<td>/</td>
+<td>127.0.0.1</td>
+<td>26381</td>
+</tr>
+<tr>
+<td>Sentinel</td>
+<td>/</td>
+<td>127.0.0.1</td>
+<td>26382</td>
+</tr>
+</tbody></table>
+<p>由于哨兵模式是基于主从复制模式实现的，所以我们只需要在主从模式的基础上增加配置文件sentinel.conf就可以了。</p>
+<h2 id="哨兵1"><a href="#哨兵1" class="headerlink" title="哨兵1"></a>哨兵1</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">protected-mode no</span><br><span class="line">port 26380</span><br><span class="line">sentinel monitor mymaster 127.0.0.1 6380 2</span><br></pre></td></tr></table></figure>
+<h2 id="哨兵2"><a href="#哨兵2" class="headerlink" title="哨兵2"></a>哨兵2</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">protected-mode no</span><br><span class="line">port 26381</span><br><span class="line">sentinel monitor mymaster 127.0.0.1 6380 2</span><br></pre></td></tr></table></figure>
+<h2 id="哨兵3"><a href="#哨兵3" class="headerlink" title="哨兵3"></a>哨兵3</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">protected-mode no</span><br><span class="line">port 26382</span><br><span class="line">sentinel monitor mymaster 127.0.0.1 6380 2</span><br></pre></td></tr></table></figure>
+<p>sentinel命令中的2代表当超过两个哨兵认为主机下线之后才会进行故障转移(failover)。<br>启动的顺序为：先启动Master进程，再启动Slave服务进程，最后启动三个哨兵进程。当按上面的顺序启动服务，如果配置正确的话，每个哨兵进程都会打印红框中的内容。<img src="/posts/df693a19/3.png"><br>我们再看下6381这台Salve服务器的信息。<img src="/posts/df693a19/4.png"><br>可以看到此时Master服务器为6380。之后我们关闭掉6380所对应的Redis服务，模拟Master宕机的情况。<img src="/posts/df693a19/5.png"><br>通过日志我们可以看到，当哨兵检测到Master宕机之后会先竞选一个新的leader，然后切换Master服务器为6381所对应的Redis服务器。我们此时再看下6381服务器的info。<img src="/posts/df693a19/6.png"><br>可以看到此时确实变成了Master服务器，如果你去查看6382Redis服务器的redis.conf文件，会发现此时slaveof已经变成了6381了。<img src="/posts/df693a19/7.png"><br>当再次启动上6380所对应的Redis，此时哨兵会打印如下信息，将6380转换为slave。<img src="/posts/df693a19/8.png"></p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><h2 id="哨兵模式的优点"><a href="#哨兵模式的优点" class="headerlink" title="哨兵模式的优点"></a>哨兵模式的优点</h2><p>哨兵模式主要有以下优点：</p>
+<ul>
+<li>哨兵集群，基于主从复制模式，拥有主从配置的所有优点。</li>
+<li>主从可以切换，故障可以转移，高可用性的系统。</li>
+</ul>
+<h2 id="哨兵模式的缺点"><a href="#哨兵模式的缺点" class="headerlink" title="哨兵模式的缺点"></a>哨兵模式的缺点</h2><p>哨兵模式主要有以下缺点：</p>
+<ul>
+<li>Redis不好在线扩容，集群容量一旦到达上限，在线扩容就十分麻烦。</li>
+<li>哨兵模式的配置繁琐。</li>
+</ul>
 
       
     </div>
@@ -434,12 +509,12 @@
   <!-- JS库 sweetalert 可修改路径 -->
   <script src="https://cdn.bootcss.com/jquery/2.0.0/jquery.min.js"></script>
   <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-  <p><span>本文标题:</span><a href="/posts/4f99d2fa/">Spring学习-refresh方法之invokeBeanFactoryPostProcessors</a></p>
+  <p><span>本文标题:</span><a href="/posts/df693a19/">Redis集群-哨兵模式</a></p>
   <p><span>文章作者:</span><a href="/" title="访问 彭椿悦 的个人博客">彭椿悦</a></p>
-  <p><span>发布时间:</span>2021年03月31日 - 11:03</p>
-  <p><span>最后更新:</span>2021年04月07日 - 16:04</p>
-  <p><span>原始链接:</span><a href="/posts/4f99d2fa/" title="Spring学习-refresh方法之invokeBeanFactoryPostProcessors">http://chunyuepeng.github.io/posts/4f99d2fa/</a>
-    <span class="copy-path"  title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="http://chunyuepeng.github.io/posts/4f99d2fa/"  aria-label="复制成功！"></i></span>
+  <p><span>发布时间:</span>2021年04月25日 - 16:04</p>
+  <p><span>最后更新:</span>2021年04月25日 - 18:04</p>
+  <p><span>原始链接:</span><a href="/posts/df693a19/" title="Redis集群-哨兵模式">http://chunyuepeng.github.io/posts/df693a19/</a>
+    <span class="copy-path"  title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="http://chunyuepeng.github.io/posts/df693a19/"  aria-label="复制成功！"></i></span>
   </p>
   <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者。</p>  
 </div>
@@ -482,9 +557,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/Spring/" rel="tag"><i class="fa fa-tag"></i> Spring</a>
+            <a href="/tags/Redis/" rel="tag"><i class="fa fa-tag"></i> Redis</a>
           
-            <a href="/tags/IoC/" rel="tag"><i class="fa fa-tag"></i> IoC</a>
+            <a href="/tags/Redis%E9%9B%86%E7%BE%A4/" rel="tag"><i class="fa fa-tag"></i> Redis集群</a>
           
         </div>
       
@@ -497,8 +572,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/posts/de434b88/" rel="next" title="Spring学习-refresh方法之prepareBeanFactory">
-                <i class="fa fa-chevron-left"></i> Spring学习-refresh方法之prepareBeanFactory
+              <a href="/posts/b0e0aa/" rel="next" title="Redis集群-主从模式">
+                <i class="fa fa-chevron-left"></i> Redis集群-主从模式
               </a>
             
           </div>
@@ -506,10 +581,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/posts/b9e6c2cb/" rel="prev" title="Spring学习-refresh方法之registerBeanPostProcessors">
-                Spring学习-refresh方法之registerBeanPostProcessors <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -699,7 +770,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#BeanFactoryPostProcessor%E4%BD%BF%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">BeanFactoryPostProcessor使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Beans-xml"><span class="nav-number">2.1.</span> <span class="nav-text">Beans.xml</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CustomBeanFactoryPostProcessor-java"><span class="nav-number">2.2.</span> <span class="nav-text">CustomBeanFactoryPostProcessor,java</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Test-java"><span class="nav-number">2.3.</span> <span class="nav-text">Test.java</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%90%E8%A1%8C%E7%BB%93%E6%9E%9C"><span class="nav-number">2.4.</span> <span class="nav-text">运行结果</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%86%E6%9E%90"><span class="nav-number">3.</span> <span class="nav-text">分析</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A6%82%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%93%A8%E5%85%B5%E6%A8%A1%E5%BC%8F"><span class="nav-number">2.</span> <span class="nav-text">哨兵模式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%95%E5%93%A8%E5%85%B5%E6%A8%A1%E5%BC%8F"><span class="nav-number">2.1.</span> <span class="nav-text">单哨兵模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%9A%E5%93%A8%E5%85%B5%E6%A8%A1%E5%BC%8F"><span class="nav-number">2.2.</span> <span class="nav-text">多哨兵模式</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%93%A8%E5%85%B5%E6%A8%A1%E5%BC%8F%E9%85%8D%E7%BD%AE"><span class="nav-number">3.</span> <span class="nav-text">哨兵模式配置</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%93%A8%E5%85%B51"><span class="nav-number">3.1.</span> <span class="nav-text">哨兵1</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%93%A8%E5%85%B52"><span class="nav-number">3.2.</span> <span class="nav-text">哨兵2</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%93%A8%E5%85%B53"><span class="nav-number">3.3.</span> <span class="nav-text">哨兵3</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%93%A8%E5%85%B5%E6%A8%A1%E5%BC%8F%E7%9A%84%E4%BC%98%E7%82%B9"><span class="nav-number">4.1.</span> <span class="nav-text">哨兵模式的优点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%93%A8%E5%85%B5%E6%A8%A1%E5%BC%8F%E7%9A%84%E7%BC%BA%E7%82%B9"><span class="nav-number">4.2.</span> <span class="nav-text">哨兵模式的缺点</span></a></li></ol></li></ol></div>
             
 
           </div>
