@@ -78,7 +78,7 @@
 
 
 
-  <meta name="keywords" content="Spring,IoC," />
+  <meta name="keywords" content="线程安全," />
 
 
 
@@ -89,19 +89,26 @@
 
 
 
-<meta name="description" content="多播器简介学过编程语言的应该对事件不陌生，当一些事件发生时，你需要通知其事件的监听器做相应的处理。这其实是设计模式中的观察者模式的典型应用。 使用自定义事件在Spring中你只需要继承ApplicationEvent即可以完成一个自定义的事件。 1234567891011121314151617181920public class TestEvent extends ApplicationEven">
+<meta name="description" content="概述了解java多线程的都知道，如果需要对一个方法或代码块进行同步的话我们只需要使用syncchronized去修饰待同步的方法和代码块即可。那JVM底层到底是怎样实现此功能的呢？以及对加锁过程做了什么优化呢？本篇文章将带你搞清楚以上问题。 实现原理关键字使用123456789101112public class Synchronized &amp;#123;    Object object &amp;#x3D">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Spring学习-refresh方法之initApplicationEventMulticaster">
-<meta property="og:url" content="http://chunyuepeng.github.io/posts/eba13e6c/index.html">
+<meta property="og:title" content="synchronized原理和锁膨胀过程">
+<meta property="og:url" content="http://chunyuepeng.github.io/posts/fbfc5d2a/index.html">
 <meta property="og:site_name" content="彭椿悦">
-<meta property="og:description" content="多播器简介学过编程语言的应该对事件不陌生，当一些事件发生时，你需要通知其事件的监听器做相应的处理。这其实是设计模式中的观察者模式的典型应用。 使用自定义事件在Spring中你只需要继承ApplicationEvent即可以完成一个自定义的事件。 1234567891011121314151617181920public class TestEvent extends ApplicationEven">
+<meta property="og:description" content="概述了解java多线程的都知道，如果需要对一个方法或代码块进行同步的话我们只需要使用syncchronized去修饰待同步的方法和代码块即可。那JVM底层到底是怎样实现此功能的呢？以及对加锁过程做了什么优化呢？本篇文章将带你搞清楚以上问题。 实现原理关键字使用123456789101112public class Synchronized &amp;#123;    Object object &amp;#x3D">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2021-03-31T08:40:20.000Z">
-<meta property="article:modified_time" content="2021-04-07T08:38:31.845Z">
+<meta property="og:image" content="http://chunyuepeng.github.io/posts/fbfc5d2a/1.png">
+<meta property="og:image" content="http://chunyuepeng.github.io/posts/fbfc5d2a/2.png">
+<meta property="og:image" content="http://chunyuepeng.github.io/posts/fbfc5d2a/3.png">
+<meta property="og:image" content="http://chunyuepeng.github.io/posts/fbfc5d2a/4.png">
+<meta property="og:image" content="http://chunyuepeng.github.io/posts/fbfc5d2a/5.png">
+<meta property="og:image" content="http://chunyuepeng.github.io/posts/fbfc5d2a/6.png">
+<meta property="og:image" content="http://chunyuepeng.github.io/posts/fbfc5d2a/7.png">
+<meta property="article:published_time" content="2021-04-27T02:33:03.000Z">
+<meta property="article:modified_time" content="2021-04-27T07:39:42.305Z">
 <meta property="article:author" content="彭椿悦">
-<meta property="article:tag" content="Spring">
-<meta property="article:tag" content="IoC">
+<meta property="article:tag" content="线程安全">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://chunyuepeng.github.io/posts/fbfc5d2a/1.png">
 
 
 
@@ -131,13 +138,13 @@
 
 
 
-  <link rel="canonical" href="http://chunyuepeng.github.io/posts/eba13e6c/"/>
+  <link rel="canonical" href="http://chunyuepeng.github.io/posts/fbfc5d2a/"/>
 
 
 
 
 
-  <title>Spring学习-refresh方法之initApplicationEventMulticaster | 彭椿悦</title>
+  <title>synchronized原理和锁膨胀过程 | 彭椿悦</title>
   
 
 
@@ -310,7 +317,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://chunyuepeng.github.io/posts/eba13e6c/">
+    <link itemprop="mainEntityOfPage" href="http://chunyuepeng.github.io/posts/fbfc5d2a/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="彭椿悦">
@@ -327,7 +334,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Spring学习-refresh方法之initApplicationEventMulticaster</h1>
+          <h1 class="post-title" itemprop="name headline">synchronized原理和锁膨胀过程</h1>
         
 
         <div class="post-meta">
@@ -339,8 +346,8 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2021-03-31T16:40:20+08:00">
-                2021-03-31
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2021-04-27T10:33:03+08:00">
+                2021-04-27
               </time>
             
 
@@ -371,7 +378,7 @@
                   <span class="post-meta-item-text">Words count in article&#58;</span>
                 
                 <span title="Words count in article">
-                  658
+                  2.5k
                 </span>
               
 
@@ -387,7 +394,7 @@
                   <span class="post-meta-item-text">Reading time &asymp;</span>
                 
                 <span title="Reading time">
-                  3
+                  9
                 </span>
               
             </div>
@@ -408,19 +415,75 @@
       
 
       
-        <h1 id="多播器简介"><a href="#多播器简介" class="headerlink" title="多播器简介"></a>多播器简介</h1><p>学过编程语言的应该对事件不陌生，当一些事件发生时，你需要通知其事件的监听器做相应的处理。这其实是设计模式中的观察者模式的典型应用。</p>
-<h1 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h1><h2 id="自定义事件"><a href="#自定义事件" class="headerlink" title="自定义事件"></a>自定义事件</h2><p>在Spring中你只需要继承<code>ApplicationEvent</code>即可以完成一个自定义的事件。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">public class TestEvent extends ApplicationEvent &#123;</span><br><span class="line">    &#x2F;**</span><br><span class="line">     * Create a new &#123;@code ApplicationEvent&#125;.</span><br><span class="line">     *</span><br><span class="line">     * @param source the object on which the event initially occurred or with</span><br><span class="line">     *               which the event is associated (never &#123;@code null&#125;)</span><br><span class="line">     *&#x2F;</span><br><span class="line">    public TestEvent(Object source) &#123;</span><br><span class="line">        super(source);</span><br><span class="line">    &#125;</span><br><span class="line">    public String msg;</span><br><span class="line"></span><br><span class="line">    public TestEvent(Object source, String msg) &#123;</span><br><span class="line">        super(source);</span><br><span class="line">        this.msg &#x3D; msg;</span><br><span class="line">    &#125;</span><br><span class="line">    public void print()&#123;</span><br><span class="line">        System.out.println(msg);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="监听器"><a href="#监听器" class="headerlink" title="监听器"></a>监听器</h2><p>可以通过实现<code>ApplicationListener</code>或者使用<code>@EventListener</code>注解来创建一个监听器。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public class TestListener implements ApplicationListener &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void onApplicationEvent(ApplicationEvent event) &#123;</span><br><span class="line">        if (event instanceof TestEvent)&#123;</span><br><span class="line">            TestEvent event1 &#x3D; (TestEvent) event;</span><br><span class="line">            event1.print();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="事件发布"><a href="#事件发布" class="headerlink" title="事件发布"></a>事件发布</h2><p>Spring中发布事件的接口是ApplicationEventPublisher，我们可以自定义自己的类，当然也可以使用spring现成的类。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public class Test &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        ApplicationContext context &#x3D; new ClassPathXmlApplicationContext(&quot;Bean.xml&quot;);</span><br><span class="line">        TestEvent event &#x3D; new TestEvent(&quot;hello&quot;,&quot;msg&quot;);</span><br><span class="line">        context.publishEvent(event);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="运行结果"><a href="#运行结果" class="headerlink" title="运行结果"></a>运行结果</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msg</span><br></pre></td></tr></table></figure>
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><h2 id="事件发布-1"><a href="#事件发布-1" class="headerlink" title="事件发布"></a>事件发布</h2><p>当调用<code>publishEvent()</code>方法时最后发布事件的方法为<code>SimpleApplicationEvenMulticaster#multicastEvent()</code>，进入此方法</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">public void multicastEvent(final ApplicationEvent event, @Nullable ResolvableType eventType) &#123;</span><br><span class="line">	ResolvableType type &#x3D; (eventType !&#x3D; null ? eventType : resolveDefaultEventType(event));</span><br><span class="line">	Executor executor &#x3D; getTaskExecutor();</span><br><span class="line">	&#x2F;*xxx: 从这里可以看出，对监听器的执行是通过遍历执行的*&#x2F;</span><br><span class="line">	for (ApplicationListener&lt;?&gt; listener : getApplicationListeners(event, type)) &#123;</span><br><span class="line">		if (executor !&#x3D; null) &#123;</span><br><span class="line">			executor.execute(() -&gt; invokeListener(listener, event));</span><br><span class="line">		&#125;</span><br><span class="line">		else if (this.applicationStartup !&#x3D; null) &#123;</span><br><span class="line">			StartupStep invocationStep &#x3D; this.applicationStartup.start(&quot;spring.event.invoke-listener&quot;);</span><br><span class="line">			invokeListener(listener, event);</span><br><span class="line">			invocationStep.tag(&quot;event&quot;, event::toString);</span><br><span class="line">			if (eventType !&#x3D; null) &#123;</span><br><span class="line">				invocationStep.tag(&quot;eventType&quot;, eventType::toString);</span><br><span class="line">			&#125;</span><br><span class="line">			invocationStep.tag(&quot;listener&quot;, listener::toString);</span><br><span class="line">			invocationStep.end();</span><br><span class="line">		&#125;</span><br><span class="line">		else &#123;</span><br><span class="line">			invokeListener(listener, event);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>可以看出这里其实就是遍历了所有的监听器，然后调用<code>onApplicationEvent()</code>方法。</p>
-<h2 id="初始化多播器"><a href="#初始化多播器" class="headerlink" title="初始化多播器"></a>初始化多播器</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">protected void initApplicationEventMulticaster() &#123;</span><br><span class="line">	ConfigurableListableBeanFactory beanFactory &#x3D; getBeanFactory();</span><br><span class="line">	&#x2F;&#x2F;判断是否存在beanname为applicationEventMulticaster的BeanDefinition</span><br><span class="line">	if (beanFactory.containsLocalBean(APPLICATION_EVENT_MULTICASTER_BEAN_NAME)) &#123;</span><br><span class="line">		this.applicationEventMulticaster &#x3D;</span><br><span class="line">				beanFactory.getBean(APPLICATION_EVENT_MULTICASTER_BEAN_NAME, ApplicationEventMulticaster.class);</span><br><span class="line">		if (logger.isTraceEnabled()) &#123;</span><br><span class="line">			logger.trace(&quot;Using ApplicationEventMulticaster [&quot; + this.applicationEventMulticaster + &quot;]&quot;);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	else &#123;</span><br><span class="line">		&#x2F;&#x2F;当产生Spring事件的时候会默认使用SimpleApplicationEventMulticaster</span><br><span class="line">		&#x2F;&#x2F;的multicastEvent来广播事件</span><br><span class="line">		SimpleApplicationEventMulticaster simpleApplicationEventMulticaster &#x3D; new SimpleApplicationEventMulticaster(beanFactory);</span><br><span class="line">		simpleApplicationEventMulticaster.setApplicationStartup(getApplicationStartup());</span><br><span class="line">		this.applicationEventMulticaster &#x3D; simpleApplicationEventMulticaster;</span><br><span class="line">		beanFactory.registerSingleton(APPLICATION_EVENT_MULTICASTER_BEAN_NAME, this.applicationEventMulticaster);</span><br><span class="line">		if (logger.isTraceEnabled()) &#123;</span><br><span class="line">			logger.trace(&quot;No &#39;&quot; + APPLICATION_EVENT_MULTICASTER_BEAN_NAME + &quot;&#39; bean, using &quot; +</span><br><span class="line">					&quot;[&quot; + this.applicationEventMulticaster.getClass().getSimpleName() + &quot;]&quot;);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>多播器初始化的流程也是比较简单的就是先判断用户是否自定义了applicationEventMulticaster的bean，如果没有则创建<code>SimpleApplicationEventMulticaster</code>的多播器，并添加到beanFactory中。</p>
+        <h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>了解java多线程的都知道，如果需要对一个方法或代码块进行同步的话我们只需要使用syncchronized去修饰待同步的方法和代码块即可。那JVM底层到底是怎样实现此功能的呢？以及对加锁过程做了什么优化呢？本篇文章将带你搞清楚以上问题。</p>
+<h1 id="实现原理"><a href="#实现原理" class="headerlink" title="实现原理"></a>实现原理</h1><h2 id="关键字使用"><a href="#关键字使用" class="headerlink" title="关键字使用"></a>关键字使用</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">public class Synchronized &#123;</span><br><span class="line">    Object object &#x3D; new Object();</span><br><span class="line">    public synchronized void sayHello()&#123;</span><br><span class="line">        synchronized (object)&#123;</span><br><span class="line">            int a &#x3D; 1;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void sysHelloWithoutSync()&#123;</span><br><span class="line">        int a &#x3D; 1;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们通常要对方法和代码块进行同步的话只需要像上面代码的方式来使用即可，我们通过反编译命令<code>javap -v Synchronized.class</code>查看jvm编译生成的字节码信息(省略了部分信息)。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line">public synchronized void sayHello();</span><br><span class="line">  descriptor: ()V</span><br><span class="line">  flags: ACC_PUBLIC, ACC_SYNCHRONIZED</span><br><span class="line">  Code:</span><br><span class="line">    stack&#x3D;2, locals&#x3D;4, args_size&#x3D;1</span><br><span class="line">       0: aload_0</span><br><span class="line">       1: getfield      #3                  &#x2F;&#x2F; Field object:Ljava&#x2F;lang&#x2F;Object;</span><br><span class="line">       4: dup</span><br><span class="line">       5: astore_1</span><br><span class="line">       6: monitorenter</span><br><span class="line">       7: iconst_1</span><br><span class="line">       8: istore_2</span><br><span class="line">       9: aload_1</span><br><span class="line">      10: monitorexit</span><br><span class="line">      11: goto          19</span><br><span class="line">      14: astore_3</span><br><span class="line">      15: aload_1</span><br><span class="line">      16: monitorexit</span><br><span class="line">      17: aload_3</span><br><span class="line">      18: athrow</span><br><span class="line">      19: return</span><br><span class="line">    Exception table:</span><br><span class="line">       from    to  target type</span><br><span class="line">           7    11    14   any</span><br><span class="line">          14    17    14   any</span><br><span class="line">    LineNumberTable:</span><br><span class="line">      line 11: 0</span><br><span class="line">      line 12: 7</span><br><span class="line">      line 13: 9</span><br><span class="line">      line 14: 19</span><br><span class="line">    LocalVariableTable:</span><br><span class="line">      Start  Length  Slot  Name   Signature</span><br><span class="line">          0      20     0  this   Lthread&#x2F;Synchronized;</span><br><span class="line">    StackMapTable: number_of_entries &#x3D; 2</span><br><span class="line">      frame_type &#x3D; 255 &#x2F;* full_frame *&#x2F;</span><br><span class="line">        offset_delta &#x3D; 14</span><br><span class="line">        locals &#x3D; [ class thread&#x2F;Synchronized, class java&#x2F;lang&#x2F;Object ]</span><br><span class="line">        stack &#x3D; [ class java&#x2F;lang&#x2F;Throwable ]</span><br><span class="line">      frame_type &#x3D; 250 &#x2F;* chop *&#x2F;</span><br><span class="line">        offset_delta &#x3D; 4</span><br><span class="line"></span><br><span class="line">public void sysHelloWithoutSync();</span><br><span class="line">  descriptor: ()V</span><br><span class="line">  flags: ACC_PUBLIC</span><br><span class="line">  Code:</span><br><span class="line">    stack&#x3D;1, locals&#x3D;2, args_size&#x3D;1</span><br><span class="line">       0: iconst_1</span><br><span class="line">       1: istore_1</span><br><span class="line">       2: return</span><br><span class="line">    LineNumberTable:</span><br><span class="line">      line 17: 0</span><br><span class="line">      line 18: 2</span><br><span class="line">    LocalVariableTable:</span><br><span class="line">      Start  Length  Slot  Name   Signature</span><br><span class="line">          0       3     0  this   Lthread&#x2F;Synchronized;</span><br><span class="line">          2       1     1     a   I</span><br></pre></td></tr></table></figure>
+<p>通过对比使用了synchronized关键字的方法和未使用该关键字的方法，使用了该关键字的方法有<code>ACC_SYNCHRONIZED</code>标记以及多了<code>monitorenter</code>和<code>monitorexit</code>两条指令。<code>ACC_SYNCHRONIZED</code>标记代表该方法是一个同步方法，当调用该方法时会去隐式的调用<code>monitorenter</code>和<code>monitorexit</code>两条指令。可以看到如果使用了synchronized，jvm会自动为同步代码块生成异常表，在产生异常之后，会去调用monitorexit指令来释放锁。</p>
+<h2 id="monitorenter和monitorexit"><a href="#monitorenter和monitorexit" class="headerlink" title="monitorenter和monitorexit"></a>monitorenter和monitorexit</h2><p>JVM对于这两个字节码的实现，主要是基于Mark Word和monitor来实现的。</p>
+<h3 id="Mark-Word"><a href="#Mark-Word" class="headerlink" title="Mark Word"></a>Mark Word</h3><p>在JVM中一个对象的构成如下如所示。<img src="/posts/fbfc5d2a/1.png" alt="对象构成"><br>Hotspot虚拟机的对象头主要包含两部分数据：Mark word（标记字段）、Klass Pointer（类型指针）。其中类型指针是对象只想它的类元数据的指针，虚拟机通过该对象来确定实例属于哪个类，Mark word用于存储对象自身运行时数据，他是synchronized实现偏向锁和轻量级锁的关键。<br>Mark word结构如下图所示。<img src="/posts/fbfc5d2a/2.png"></p>
+<h3 id="monitor"><a href="#monitor" class="headerlink" title="monitor"></a>monitor</h3><p>你可以将monitor理解为一个同步工具，也可以理解为一种同步机制，这其实是一个对象，minitor源码是c++实现的，在虚拟机的ObjectMonitor.hpp文件中。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">  ObjectMonitor() &#123;</span><br><span class="line">    _header       &#x3D; NULL;</span><br><span class="line">    _count        &#x3D; 0;</span><br><span class="line">    _waiters      &#x3D; 0,</span><br><span class="line">    _recursions   &#x3D; 0;  &#x2F;&#x2F; 线程重入次数</span><br><span class="line">    _object       &#x3D; NULL;  &#x2F;&#x2F; 存储Monitor对象</span><br><span class="line">    _owner        &#x3D; NULL;  &#x2F;&#x2F; 持有当前线程的owner</span><br><span class="line">    _WaitSet      &#x3D; NULL;  &#x2F;&#x2F; wait状态的线程列表</span><br><span class="line">    _WaitSetLock  &#x3D; 0 ;</span><br><span class="line">    _Responsible  &#x3D; NULL ;</span><br><span class="line">    _succ         &#x3D; NULL ;</span><br><span class="line">    _cxq          &#x3D; NULL ;  &#x2F;&#x2F; 单向列表</span><br><span class="line">    FreeNext      &#x3D; NULL ;</span><br><span class="line">    _EntryList    &#x3D; NULL ;  &#x2F;&#x2F; 处于等待锁状态block状态的线程列表</span><br><span class="line">    _SpinFreq     &#x3D; 0 ;</span><br><span class="line">    _SpinClock    &#x3D; 0 ;</span><br><span class="line">    OwnerIsThread &#x3D; 0 ;</span><br><span class="line">    _previous_owner_tid &#x3D; 0;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>monitor对象是实现重量级锁的关键。</p>
+<h1 id="为什么不直接使用重量级锁"><a href="#为什么不直接使用重量级锁" class="headerlink" title="为什么不直接使用重量级锁"></a>为什么不直接使用重量级锁</h1><p>在使用重量级锁的时候会引起用户态和内核台的转换，这种切换对于性能的消耗非常大。在1.6之前都是重量级锁，重量级的本质是monitor对象调用的过程以及Linux内核复杂的机制决定的。所以才引出了偏向锁和轻量级锁来提高同步的性能。</p>
+<h1 id="锁膨胀过程"><a href="#锁膨胀过程" class="headerlink" title="锁膨胀过程"></a>锁膨胀过程</h1><p>锁主要存在四种状态，级别从低到高分别是：无锁状态、偏向锁状态、轻量级锁状态、重量级锁状态，这几个状态会随着竞争状态而升级，这个升级过程就是锁膨胀的过程，只有重量级锁是需要使用操作系统底层mutex互斥原语来实现，其它锁都是通过对象头来实现的。需要注意锁可以升级但不能降级。<img src="/posts/fbfc5d2a/3.png"></p>
+<h2 id="偏向锁"><a href="#偏向锁" class="headerlink" title="偏向锁"></a>偏向锁</h2><p>偏向锁的目的是消除无竞争情况下的同步原语，进一步提高程序运行性能。偏向锁会偏向于第一个获得它的线程，如果在接下来的执行过程中，该锁没有被其它线程获取，则持有偏向锁的线程将永远不需要再进行同步。偏向锁默认开启。</p>
+<h3 id="获取锁过程"><a href="#获取锁过程" class="headerlink" title="获取锁过程"></a>获取锁过程</h3><p><img src="/posts/fbfc5d2a/4.png"><br>偏向锁加锁的过程如下：</p>
+<ul>
+<li>检查Mark Word中的线程ID是否是当前线程ID，如果是直接执行同步块。</li>
+<li>如果Mark Word中存储的线程ID不是本线程的ID，则通过CAS操作去修改线程ID为本线程ID，修改成功则执行同步代码块。</li>
+<li>如果CAS修改线程ID失败，则当拥有该偏向锁的线程到达安全点之后，挂起这个线程，然后将偏向锁升级为轻量级锁。</li>
+</ul>
+<h3 id="锁释放过程"><a href="#锁释放过程" class="headerlink" title="锁释放过程"></a>锁释放过程</h3><p><img src="/posts/fbfc5d2a/5.png"><br>偏向锁释放锁过程如下：</p>
+<ul>
+<li>线程不会主动去释放偏向锁，需要等到其它线程来竞争时才会去释放偏向锁。</li>
+<li>等待全局安全点（在此时间点没有字节码正在执行）。</li>
+<li>挂起持有偏向锁的线程。</li>
+<li>判断偏向锁线程是否处于同步块，如果处于同步块则将锁升级为轻量级锁并唤醒原持有偏向锁的线程。如果已经退出了同步块，则将锁设置为无锁状态，并将偏向锁位置为0代表后面使用轻量级锁。</li>
+</ul>
+<h2 id="轻量级锁"><a href="#轻量级锁" class="headerlink" title="轻量级锁"></a>轻量级锁</h2><p>轻量级锁时相对于使用底层mutex互斥原语实现同步的重量级锁而言的，轻量级锁同步时通过对象头的Mark Word实现的。在获取锁时，如果对象是无锁的，jvm就会在当前线程的栈帧中建立一个叫锁记录（Lock Record）的空间，用来存储对象的Mark Word拷贝，然后将对象的Mark Word更新位执行Lock Record的指针。</p>
+<h3 id="获取锁过程-1"><a href="#获取锁过程-1" class="headerlink" title="获取锁过程"></a>获取锁过程</h3><ol>
+<li>在线程进入同步方法、同步块的时候，如果同步对象锁状态为无锁状态(锁标志位为”01”状态，是否为偏向锁为”0”)，虚拟机首先将在当前线程的栈帧中建立一个名为锁记录(Lock Recored)的空间，用于储存锁对象目前的Mark Word的拷贝(官方把这份拷贝加了个Displaced前缀，即Displaced Mark Word)。</li>
+<li>将对象头的Mark Word拷贝到线程的锁记录(Lock Recored)中。</li>
+<li>拷贝成功后，虚拟机将使用CAS操作尝试将对象的Mark Word更新为指向Lock Record的指针。如果这个更新成功了，则执行步骤4，否则执行步骤5。</li>
+<li>更新成功，这个线程就拥有了该对象的锁，并且对象Mark Word的锁标志位将转变为”00”，即表示此对象处于轻量级锁的状态。</li>
+<li>更新失败，虚拟机首先会检查对象的Mark Word是否指向当前线程的栈帧，如果是就说明当前线程已经拥有了这个对象的锁，可以直接进入同步块继续执行，否则说明这个锁对象已经被其其它线程抢占了。进行自旋执行步骤3，如果自旋结束仍然没有获得锁，轻量级锁就需要膨胀为重量级锁，锁标志位状态值变为”10”，Mark Word中储存就是指向monitor对象的指针，当前线程以及后面等待锁的线程也要进入阻塞状态。</li>
+</ol>
+<h3 id="锁释放过程-1"><a href="#锁释放过程-1" class="headerlink" title="锁释放过程"></a>锁释放过程</h3><ol>
+<li>使用CAS操作将对象当前的Mark Word和线程中复制的Displaced Mark Word替换回来(依据Mark Word中锁记录指针是否还指向本线程的锁记录)，如果替换成功，则执行步骤2，否则执行步骤3。</li>
+<li>如果替换成功，整个同步过程就完成了，恢复到无锁的状态(01)。</li>
+<li>如果替换失败，说明有其他线程尝试获取该锁(此时锁已膨胀为重量级锁)，那就要在释放锁的同时，唤醒被挂起的线程。</li>
+</ol>
+<h2 id="重量级锁"><a href="#重量级锁" class="headerlink" title="重量级锁"></a>重量级锁</h2><p>前面讲到了重量级锁是尹爱与底层操作系统的mutex互斥原语的，线程获取、释放monitor过程如下：<img src="/posts/fbfc5d2a/6.png"><br>当线程尝试获取monitor的所有权时，如果获取失败说明monitor被其它线程占用，那么会将线程放入阻塞队列中，等待其它线程释放monitor之后，会去唤醒同步队列中的第一个节点去获取。当线程释放monitor之后可能此时正好有一个线程来获取monitor，jvm会直接将monitor的所有权给该线程，而不会去唤醒同步队列中的第一个节点去获取，所以synchronized是非公平锁。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><h2 id="锁优缺点对比"><a href="#锁优缺点对比" class="headerlink" title="锁优缺点对比"></a>锁优缺点对比</h2><table>
+<thead>
+<tr>
+<th>锁</th>
+<th>优点</th>
+<th>缺点</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>偏向锁</td>
+<td>加锁解锁不需要额外的消耗，和执行非同步方法时间相差小</td>
+<td>如果线程键存在锁竞争，会带来额外锁撤消的消耗</td>
+<td>一个线程访问同步块场景</td>
+</tr>
+<tr>
+<td>轻量级锁</td>
+<td>竞争的线程不会阻塞，提高程序的相应速度</td>
+<td>得不到锁会自旋消耗CPU</td>
+<td>同步代码块执行时间短</td>
+</tr>
+<tr>
+<td>重量级锁</td>
+<td>线程竞争不使用自旋，不会消耗CPU</td>
+<td>线程阻塞，响应时间慢</td>
+<td>同步代码块执行时间长</td>
+</tr>
+</tbody></table>
+<p>最后再贴一张synchronized执行的流程图。<img src="/posts/fbfc5d2a/7.png"></p>
 
       
     </div>
@@ -437,12 +500,12 @@
   <!-- JS库 sweetalert 可修改路径 -->
   <script src="https://cdn.bootcss.com/jquery/2.0.0/jquery.min.js"></script>
   <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-  <p><span>本文标题:</span><a href="/posts/eba13e6c/">Spring学习-refresh方法之initApplicationEventMulticaster</a></p>
+  <p><span>本文标题:</span><a href="/posts/fbfc5d2a/">synchronized原理和锁膨胀过程</a></p>
   <p><span>文章作者:</span><a href="/" title="访问 彭椿悦 的个人博客">彭椿悦</a></p>
-  <p><span>发布时间:</span>2021年03月31日 - 16:03</p>
-  <p><span>最后更新:</span>2021年04月07日 - 16:04</p>
-  <p><span>原始链接:</span><a href="/posts/eba13e6c/" title="Spring学习-refresh方法之initApplicationEventMulticaster">http://chunyuepeng.github.io/posts/eba13e6c/</a>
-    <span class="copy-path"  title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="http://chunyuepeng.github.io/posts/eba13e6c/"  aria-label="复制成功！"></i></span>
+  <p><span>发布时间:</span>2021年04月27日 - 10:04</p>
+  <p><span>最后更新:</span>2021年04月27日 - 15:04</p>
+  <p><span>原始链接:</span><a href="/posts/fbfc5d2a/" title="synchronized原理和锁膨胀过程">http://chunyuepeng.github.io/posts/fbfc5d2a/</a>
+    <span class="copy-path"  title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="http://chunyuepeng.github.io/posts/fbfc5d2a/"  aria-label="复制成功！"></i></span>
   </p>
   <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者。</p>  
 </div>
@@ -485,9 +548,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/Spring/" rel="tag"><i class="fa fa-tag"></i> Spring</a>
-          
-            <a href="/tags/IoC/" rel="tag"><i class="fa fa-tag"></i> IoC</a>
+            <a href="/tags/%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8/" rel="tag"><i class="fa fa-tag"></i> 线程安全</a>
           
         </div>
       
@@ -500,8 +561,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/posts/2704654a/" rel="next" title="Spring学习-refresh方法之initMessageSource">
-                <i class="fa fa-chevron-left"></i> Spring学习-refresh方法之initMessageSource
+              <a href="/posts/2f89bd1c/" rel="next" title="Redis集群-Cluster">
+                <i class="fa fa-chevron-left"></i> Redis集群-Cluster
               </a>
             
           </div>
@@ -509,10 +570,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/posts/2bc3b25f/" rel="prev" title="Spring学习-refresh方法之registerListeners">
-                Spring学习-refresh方法之registerListeners <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -702,7 +759,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A4%9A%E6%92%AD%E5%99%A8%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">多播器简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E4%BA%8B%E4%BB%B6"><span class="nav-number">2.1.</span> <span class="nav-text">自定义事件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%91%E5%90%AC%E5%99%A8"><span class="nav-number">2.2.</span> <span class="nav-text">监听器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8B%E4%BB%B6%E5%8F%91%E5%B8%83"><span class="nav-number">2.3.</span> <span class="nav-text">事件发布</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%90%E8%A1%8C%E7%BB%93%E6%9E%9C"><span class="nav-number">2.4.</span> <span class="nav-text">运行结果</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%86%E6%9E%90"><span class="nav-number">3.</span> <span class="nav-text">分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8B%E4%BB%B6%E5%8F%91%E5%B8%83-1"><span class="nav-number">3.1.</span> <span class="nav-text">事件发布</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9D%E5%A7%8B%E5%8C%96%E5%A4%9A%E6%92%AD%E5%99%A8"><span class="nav-number">3.2.</span> <span class="nav-text">初始化多播器</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A6%82%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86"><span class="nav-number">2.</span> <span class="nav-text">实现原理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E5%AD%97%E4%BD%BF%E7%94%A8"><span class="nav-number">2.1.</span> <span class="nav-text">关键字使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#monitorenter%E5%92%8Cmonitorexit"><span class="nav-number">2.2.</span> <span class="nav-text">monitorenter和monitorexit</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Mark-Word"><span class="nav-number">2.2.1.</span> <span class="nav-text">Mark Word</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#monitor"><span class="nav-number">2.2.2.</span> <span class="nav-text">monitor</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E7%9B%B4%E6%8E%A5%E4%BD%BF%E7%94%A8%E9%87%8D%E9%87%8F%E7%BA%A7%E9%94%81"><span class="nav-number">3.</span> <span class="nav-text">为什么不直接使用重量级锁</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%94%81%E8%86%A8%E8%83%80%E8%BF%87%E7%A8%8B"><span class="nav-number">4.</span> <span class="nav-text">锁膨胀过程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%81%8F%E5%90%91%E9%94%81"><span class="nav-number">4.1.</span> <span class="nav-text">偏向锁</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E9%94%81%E8%BF%87%E7%A8%8B"><span class="nav-number">4.1.1.</span> <span class="nav-text">获取锁过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%94%81%E9%87%8A%E6%94%BE%E8%BF%87%E7%A8%8B"><span class="nav-number">4.1.2.</span> <span class="nav-text">锁释放过程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BD%BB%E9%87%8F%E7%BA%A7%E9%94%81"><span class="nav-number">4.2.</span> <span class="nav-text">轻量级锁</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E9%94%81%E8%BF%87%E7%A8%8B-1"><span class="nav-number">4.2.1.</span> <span class="nav-text">获取锁过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%94%81%E9%87%8A%E6%94%BE%E8%BF%87%E7%A8%8B-1"><span class="nav-number">4.2.2.</span> <span class="nav-text">锁释放过程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%8D%E9%87%8F%E7%BA%A7%E9%94%81"><span class="nav-number">4.3.</span> <span class="nav-text">重量级锁</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%94%81%E4%BC%98%E7%BC%BA%E7%82%B9%E5%AF%B9%E6%AF%94"><span class="nav-number">5.1.</span> <span class="nav-text">锁优缺点对比</span></a></li></ol></li></ol></div>
             
 
           </div>

@@ -78,7 +78,7 @@
 
 
 
-  <meta name="keywords" content="Spring,IoC," />
+  <meta name="keywords" content="Hexo, NexT" />
 
 
 
@@ -89,18 +89,12 @@
 
 
 
-<meta name="description" content="多播器简介学过编程语言的应该对事件不陌生，当一些事件发生时，你需要通知其事件的监听器做相应的处理。这其实是设计模式中的观察者模式的典型应用。 使用自定义事件在Spring中你只需要继承ApplicationEvent即可以完成一个自定义的事件。 1234567891011121314151617181920public class TestEvent extends ApplicationEven">
-<meta property="og:type" content="article">
-<meta property="og:title" content="Spring学习-refresh方法之initApplicationEventMulticaster">
-<meta property="og:url" content="http://chunyuepeng.github.io/posts/eba13e6c/index.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="彭椿悦">
+<meta property="og:url" content="http://chunyuepeng.github.io/tags/%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8/index.html">
 <meta property="og:site_name" content="彭椿悦">
-<meta property="og:description" content="多播器简介学过编程语言的应该对事件不陌生，当一些事件发生时，你需要通知其事件的监听器做相应的处理。这其实是设计模式中的观察者模式的典型应用。 使用自定义事件在Spring中你只需要继承ApplicationEvent即可以完成一个自定义的事件。 1234567891011121314151617181920public class TestEvent extends ApplicationEven">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2021-03-31T08:40:20.000Z">
-<meta property="article:modified_time" content="2021-04-07T08:38:31.845Z">
 <meta property="article:author" content="彭椿悦">
-<meta property="article:tag" content="Spring">
-<meta property="article:tag" content="IoC">
 <meta name="twitter:card" content="summary">
 
 
@@ -131,13 +125,13 @@
 
 
 
-  <link rel="canonical" href="http://chunyuepeng.github.io/posts/eba13e6c/"/>
+  <link rel="canonical" href="http://chunyuepeng.github.io/tags/线程安全/"/>
 
 
 
 
 
-  <title>Spring学习-refresh方法之initApplicationEventMulticaster | 彭椿悦</title>
+  <title>Tag: 线程安全 | 彭椿悦</title>
   
 
 
@@ -156,7 +150,7 @@
     
   
 
-  <div class="container sidebar-position-left page-post-detail">
+  <div class="container sidebar-position-left ">
     <div class="headband">
 	<a target="_blank" rel="noopener" href="https://github.com/ChunyuePeng/chunyuepeng.github.io" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
 	</div>
@@ -296,243 +290,54 @@
           <div id="content" class="content">
             
 
-  <div id="posts" class="posts-expand">
-    
+  
+  
+  
+  <div class="post-block tag">
 
-  
+    <div id="posts" class="posts-collapse">
+      <div class="collection-title">
+        <h1>线程安全<small>Tag</small>
+        </h1>
+      </div>
 
-  
-  
-  
+      
+        
 
   <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://chunyuepeng.github.io/posts/eba13e6c/">
+    <header class="post-header">
 
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="彭椿悦">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="彭椿悦">
-    </span>
-
-    
-      <header class="post-header">
-
+      <h2 class="post-title">
         
+            <a class="post-title-link" href="/posts/fbfc5d2a/" itemprop="url">
+              
+                <span itemprop="name">synchronized原理和锁膨胀过程</span>
+              
+            </a>
         
-          <h1 class="post-title" itemprop="name headline">Spring学习-refresh方法之initApplicationEventMulticaster</h1>
-        
+      </h2>
 
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2021-03-31T16:40:20+08:00">
-                2021-03-31
-              </time>
-            
+      <div class="post-meta">
+        <time class="post-time" itemprop="dateCreated"
+              datetime="2021-04-27T10:33:03+08:00"
+              content="2021-04-27" >
+          04-27
+        </time>
+      </div>
 
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-            <div class="post-wordcount">
-              
-                
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-file-word-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">Words count in article&#58;</span>
-                
-                <span title="Words count in article">
-                  658
-                </span>
-              
-
-              
-                <span class="post-meta-divider">|</span>
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-clock-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">Reading time &asymp;</span>
-                
-                <span title="Reading time">
-                  3
-                </span>
-              
-            </div>
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        <h1 id="多播器简介"><a href="#多播器简介" class="headerlink" title="多播器简介"></a>多播器简介</h1><p>学过编程语言的应该对事件不陌生，当一些事件发生时，你需要通知其事件的监听器做相应的处理。这其实是设计模式中的观察者模式的典型应用。</p>
-<h1 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h1><h2 id="自定义事件"><a href="#自定义事件" class="headerlink" title="自定义事件"></a>自定义事件</h2><p>在Spring中你只需要继承<code>ApplicationEvent</code>即可以完成一个自定义的事件。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">public class TestEvent extends ApplicationEvent &#123;</span><br><span class="line">    &#x2F;**</span><br><span class="line">     * Create a new &#123;@code ApplicationEvent&#125;.</span><br><span class="line">     *</span><br><span class="line">     * @param source the object on which the event initially occurred or with</span><br><span class="line">     *               which the event is associated (never &#123;@code null&#125;)</span><br><span class="line">     *&#x2F;</span><br><span class="line">    public TestEvent(Object source) &#123;</span><br><span class="line">        super(source);</span><br><span class="line">    &#125;</span><br><span class="line">    public String msg;</span><br><span class="line"></span><br><span class="line">    public TestEvent(Object source, String msg) &#123;</span><br><span class="line">        super(source);</span><br><span class="line">        this.msg &#x3D; msg;</span><br><span class="line">    &#125;</span><br><span class="line">    public void print()&#123;</span><br><span class="line">        System.out.println(msg);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="监听器"><a href="#监听器" class="headerlink" title="监听器"></a>监听器</h2><p>可以通过实现<code>ApplicationListener</code>或者使用<code>@EventListener</code>注解来创建一个监听器。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public class TestListener implements ApplicationListener &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void onApplicationEvent(ApplicationEvent event) &#123;</span><br><span class="line">        if (event instanceof TestEvent)&#123;</span><br><span class="line">            TestEvent event1 &#x3D; (TestEvent) event;</span><br><span class="line">            event1.print();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="事件发布"><a href="#事件发布" class="headerlink" title="事件发布"></a>事件发布</h2><p>Spring中发布事件的接口是ApplicationEventPublisher，我们可以自定义自己的类，当然也可以使用spring现成的类。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public class Test &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        ApplicationContext context &#x3D; new ClassPathXmlApplicationContext(&quot;Bean.xml&quot;);</span><br><span class="line">        TestEvent event &#x3D; new TestEvent(&quot;hello&quot;,&quot;msg&quot;);</span><br><span class="line">        context.publishEvent(event);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="运行结果"><a href="#运行结果" class="headerlink" title="运行结果"></a>运行结果</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msg</span><br></pre></td></tr></table></figure>
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><h2 id="事件发布-1"><a href="#事件发布-1" class="headerlink" title="事件发布"></a>事件发布</h2><p>当调用<code>publishEvent()</code>方法时最后发布事件的方法为<code>SimpleApplicationEvenMulticaster#multicastEvent()</code>，进入此方法</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">public void multicastEvent(final ApplicationEvent event, @Nullable ResolvableType eventType) &#123;</span><br><span class="line">	ResolvableType type &#x3D; (eventType !&#x3D; null ? eventType : resolveDefaultEventType(event));</span><br><span class="line">	Executor executor &#x3D; getTaskExecutor();</span><br><span class="line">	&#x2F;*xxx: 从这里可以看出，对监听器的执行是通过遍历执行的*&#x2F;</span><br><span class="line">	for (ApplicationListener&lt;?&gt; listener : getApplicationListeners(event, type)) &#123;</span><br><span class="line">		if (executor !&#x3D; null) &#123;</span><br><span class="line">			executor.execute(() -&gt; invokeListener(listener, event));</span><br><span class="line">		&#125;</span><br><span class="line">		else if (this.applicationStartup !&#x3D; null) &#123;</span><br><span class="line">			StartupStep invocationStep &#x3D; this.applicationStartup.start(&quot;spring.event.invoke-listener&quot;);</span><br><span class="line">			invokeListener(listener, event);</span><br><span class="line">			invocationStep.tag(&quot;event&quot;, event::toString);</span><br><span class="line">			if (eventType !&#x3D; null) &#123;</span><br><span class="line">				invocationStep.tag(&quot;eventType&quot;, eventType::toString);</span><br><span class="line">			&#125;</span><br><span class="line">			invocationStep.tag(&quot;listener&quot;, listener::toString);</span><br><span class="line">			invocationStep.end();</span><br><span class="line">		&#125;</span><br><span class="line">		else &#123;</span><br><span class="line">			invokeListener(listener, event);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>可以看出这里其实就是遍历了所有的监听器，然后调用<code>onApplicationEvent()</code>方法。</p>
-<h2 id="初始化多播器"><a href="#初始化多播器" class="headerlink" title="初始化多播器"></a>初始化多播器</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">protected void initApplicationEventMulticaster() &#123;</span><br><span class="line">	ConfigurableListableBeanFactory beanFactory &#x3D; getBeanFactory();</span><br><span class="line">	&#x2F;&#x2F;判断是否存在beanname为applicationEventMulticaster的BeanDefinition</span><br><span class="line">	if (beanFactory.containsLocalBean(APPLICATION_EVENT_MULTICASTER_BEAN_NAME)) &#123;</span><br><span class="line">		this.applicationEventMulticaster &#x3D;</span><br><span class="line">				beanFactory.getBean(APPLICATION_EVENT_MULTICASTER_BEAN_NAME, ApplicationEventMulticaster.class);</span><br><span class="line">		if (logger.isTraceEnabled()) &#123;</span><br><span class="line">			logger.trace(&quot;Using ApplicationEventMulticaster [&quot; + this.applicationEventMulticaster + &quot;]&quot;);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	else &#123;</span><br><span class="line">		&#x2F;&#x2F;当产生Spring事件的时候会默认使用SimpleApplicationEventMulticaster</span><br><span class="line">		&#x2F;&#x2F;的multicastEvent来广播事件</span><br><span class="line">		SimpleApplicationEventMulticaster simpleApplicationEventMulticaster &#x3D; new SimpleApplicationEventMulticaster(beanFactory);</span><br><span class="line">		simpleApplicationEventMulticaster.setApplicationStartup(getApplicationStartup());</span><br><span class="line">		this.applicationEventMulticaster &#x3D; simpleApplicationEventMulticaster;</span><br><span class="line">		beanFactory.registerSingleton(APPLICATION_EVENT_MULTICASTER_BEAN_NAME, this.applicationEventMulticaster);</span><br><span class="line">		if (logger.isTraceEnabled()) &#123;</span><br><span class="line">			logger.trace(&quot;No &#39;&quot; + APPLICATION_EVENT_MULTICASTER_BEAN_NAME + &quot;&#39; bean, using &quot; +</span><br><span class="line">					&quot;[&quot; + this.applicationEventMulticaster.getClass().getSimpleName() + &quot;]&quot;);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>多播器初始化的流程也是比较简单的就是先判断用户是否自定义了applicationEventMulticaster的bean，如果没有则创建<code>SimpleApplicationEventMulticaster</code>的多播器，并添加到beanFactory中。</p>
-
-      
-    </div>
-    
-    
-    
-
-    <div>
-      
-        
-<div class="my_post_copyright">
-  <script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
-  
-  <!-- JS库 sweetalert 可修改路径 -->
-  <script src="https://cdn.bootcss.com/jquery/2.0.0/jquery.min.js"></script>
-  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-  <p><span>本文标题:</span><a href="/posts/eba13e6c/">Spring学习-refresh方法之initApplicationEventMulticaster</a></p>
-  <p><span>文章作者:</span><a href="/" title="访问 彭椿悦 的个人博客">彭椿悦</a></p>
-  <p><span>发布时间:</span>2021年03月31日 - 16:03</p>
-  <p><span>最后更新:</span>2021年04月07日 - 16:04</p>
-  <p><span>原始链接:</span><a href="/posts/eba13e6c/" title="Spring学习-refresh方法之initApplicationEventMulticaster">http://chunyuepeng.github.io/posts/eba13e6c/</a>
-    <span class="copy-path"  title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="http://chunyuepeng.github.io/posts/eba13e6c/"  aria-label="复制成功！"></i></span>
-  </p>
-  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者。</p>  
-</div>
-<script> 
-    var clipboard = new Clipboard('.fa-clipboard');
-	  $(".fa-clipboard").click(function(){
-      clipboard.on('success', function(){
-        swal({   
-          title: "",   
-          text: '复制成功',
-          icon: "success", 
-          showConfirmButton: true
-          });
-	    });
-    });  
-</script>
-
-
-      
-    </div>
-
-    
-
-    
-
-    
-	<div>
-      
-        <div>
-    
-        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
-    
-</div>
-
-      
-    </div>
-
-
-    <footer class="post-footer">
-      
-        <div class="post-tags">
-          
-            <a href="/tags/Spring/" rel="tag"><i class="fa fa-tag"></i> Spring</a>
-          
-            <a href="/tags/IoC/" rel="tag"><i class="fa fa-tag"></i> IoC</a>
-          
-        </div>
-      
-
-      
-      
-      
-
-      
-        <div class="post-nav">
-          <div class="post-nav-next post-nav-item">
-            
-              <a href="/posts/2704654a/" rel="next" title="Spring学习-refresh方法之initMessageSource">
-                <i class="fa fa-chevron-left"></i> Spring学习-refresh方法之initMessageSource
-              </a>
-            
-          </div>
-
-          <span class="post-nav-divider"></span>
-
-          <div class="post-nav-prev post-nav-item">
-            
-              <a href="/posts/2bc3b25f/" rel="prev" title="Spring学习-refresh方法之registerListeners">
-                Spring学习-refresh方法之registerListeners <i class="fa fa-chevron-right"></i>
-              </a>
-            
-          </div>
-        </div>
-      
-
-      
-      
-    </footer>
-  </div>
-  
-  
-  
+    </header>
   </article>
 
 
-
-    <div class="post-spread">
       
     </div>
+
   </div>
+  
+  
+  
+
+  
 
 
           </div>
@@ -540,10 +345,6 @@
 
 
           
-
-  
-
-
 
         </div>
         
@@ -564,17 +365,8 @@
       
 
       
-        <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
-            Table of Contents
-          </li>
-          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
-            Overview
-          </li>
-        </ul>
-      
 
-      <section class="site-overview-wrap sidebar-panel">
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -692,22 +484,6 @@
         </div>
       </section>
 
-      
-      <!--noindex-->
-        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
-          <div class="post-toc">
-
-            
-              
-            
-
-            
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A4%9A%E6%92%AD%E5%99%A8%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">多播器简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E4%BA%8B%E4%BB%B6"><span class="nav-number">2.1.</span> <span class="nav-text">自定义事件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%91%E5%90%AC%E5%99%A8"><span class="nav-number">2.2.</span> <span class="nav-text">监听器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8B%E4%BB%B6%E5%8F%91%E5%B8%83"><span class="nav-number">2.3.</span> <span class="nav-text">事件发布</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%90%E8%A1%8C%E7%BB%93%E6%9E%9C"><span class="nav-number">2.4.</span> <span class="nav-text">运行结果</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%86%E6%9E%90"><span class="nav-number">3.</span> <span class="nav-text">分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8B%E4%BB%B6%E5%8F%91%E5%B8%83-1"><span class="nav-number">3.1.</span> <span class="nav-text">事件发布</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9D%E5%A7%8B%E5%8C%96%E5%A4%9A%E6%92%AD%E5%99%A8"><span class="nav-number">3.2.</span> <span class="nav-text">初始化多播器</span></a></li></ol></li></ol></div>
-            
-
-          </div>
-        </section>
-      <!--/noindex-->
       
 
       
@@ -863,10 +639,6 @@
   
 
   
-  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
-<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
-
-
 
   
 
