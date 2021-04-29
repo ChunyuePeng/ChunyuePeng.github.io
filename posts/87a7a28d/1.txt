@@ -1,0 +1,563 @@
+D:\Java\jdk1.8\bin\java.exe -server -Xcomp -XX:+UnlockDiagnosticVMOptions -XX:-Inline -XX:CompileCommand=print,*VolatileTest.testVolatile -XX:CompileCommand=print,*VolatileTest.testNonvolatile "-javaagent:D:\IntelliJ IDEA 2019.3.4\lib\idea_rt.jar=56797:D:\IntelliJ IDEA 2019.3.4\bin" -Dfile.encoding=UTF-8 -classpath D:\Java\jdk1.8\jre\lib\charsets.jar;D:\Java\jdk1.8\jre\lib\deploy.jar;D:\Java\jdk1.8\jre\lib\ext\access-bridge-64.jar;D:\Java\jdk1.8\jre\lib\ext\cldrdata.jar;D:\Java\jdk1.8\jre\lib\ext\dnsns.jar;D:\Java\jdk1.8\jre\lib\ext\jaccess.jar;D:\Java\jdk1.8\jre\lib\ext\jfxrt.jar;D:\Java\jdk1.8\jre\lib\ext\localedata.jar;D:\Java\jdk1.8\jre\lib\ext\nashorn.jar;D:\Java\jdk1.8\jre\lib\ext\sunec.jar;D:\Java\jdk1.8\jre\lib\ext\sunjce_provider.jar;D:\Java\jdk1.8\jre\lib\ext\sunmscapi.jar;D:\Java\jdk1.8\jre\lib\ext\sunpkcs11.jar;D:\Java\jdk1.8\jre\lib\ext\zipfs.jar;D:\Java\jdk1.8\jre\lib\javaws.jar;D:\Java\jdk1.8\jre\lib\jce.jar;D:\Java\jdk1.8\jre\lib\jfr.jar;D:\Java\jdk1.8\jre\lib\jfxswt.jar;D:\Java\jdk1.8\jre\lib\jsse.jar;D:\Java\jdk1.8\jre\lib\management-agent.jar;D:\Java\jdk1.8\jre\lib\plugin.jar;D:\Java\jdk1.8\jre\lib\resources.jar;D:\Java\jdk1.8\jre\lib\rt.jar;E:\pcy\target\classes;C:\Users\chunyue_peng\.m2\repository\org\springframework\boot\spring-boot-starter-data-jpa\2.3.4.RELEASE\spring-boot-starter-data-jpa-2.3.4.RELEASE.jar;C:\Users\chunyue_peng\.m2\repository\org\springframework\boot\spring-boot-starter-aop\2.3.4.RELEASE\spring-boot-starter-aop-2.3.4.RELEASE.jar;C:\Users\chunyue_peng\.m2\repository\org\springframework\spring-aop\5.2.9.RELEASE\spring-aop-5.2.9.RELEASE.jar;C:\Users\chunyue_peng\.m2\repository\org\aspectj\aspectjweaver\1.9.6\aspectjweaver-1.9.6.jar;C:\Users\chunyue_peng\.m2\repository\org\springframework\boot\spring-boot-starter-jdbc\2.3.4.RELEASE\spring-boot-starter-jdbc-2.3.4.RELEASE.jar;C:\Users\chunyue_peng\.m2\repository\com\zaxxer\HikariCP\3.4.5\HikariCP-3.4.5.jar;C:\Users\chunyue_peng\.m2\repository\org\springframework\spring-jdbc\5.2.9.RELEASE\spring-jdbc-5.2.9.RELEASE.jar;C:\Users\chunyue_peng\.m2\repository\jakarta\transaction\jakarta.transaction-api\1.3.3\jakarta.transaction-api-1.3.3.jar;C:\Users\chunyue_peng\.m2\repository\jakarta\persistence\jakarta.persistence-api\2.2.3\jakarta.persistence-api-2.2.3.jar;C:\Users\chunyue_peng\.m2\repository\org\hibernate\hibernate-core\5.4.21.Final\hibernate-core-5.4.21.Final.jar;C:\Users\chunyue_peng\.m2\repository\org\jboss\logging\jboss-logging\3.4.1.Final\jboss-logging-3.4.1.Final.jar;C:\Users\chunyue_peng\.m2\repository\org\javassist\javassist\3.24.0-GA\javassist-3.24.0-GA.jar;C:\Users\chunyue_peng\.m2\repository\net\bytebuddy\byte-buddy\1.10.14\byte-buddy-1.10.14.jar;C:\Users\chunyue_peng\.m2\repository\antlr\antlr\2.7.7\antlr-2.7.7.jar;C:\Users\chunyue_peng\.m2\repository\org\jboss\jandex\2.1.3.Final\jandex-2.1.3.Final.jar;C:\Users\chunyue_peng\.m2\repository\com\fasterxml\classmate\1.5.1\classmate-1.5.1.jar;C:\Users\chunyue_peng\.m2\repository\org\dom4j\dom4j\2.1.3\dom4j-2.1.3.jar;C:\Users\chunyue_peng\.m2\repository\org\hibernate\common\hibernate-commons-annotations\5.1.0.Final\hibernate-commons-annotations-5.1.0.Final.jar;C:\Users\chunyue_peng\.m2\repository\org\glassfish\jaxb\jaxb-runtime\2.3.3\jaxb-runtime-2.3.3.jar;C:\Users\chunyue_peng\.m2\repository\org\glassfish\jaxb\txw2\2.3.3\txw2-2.3.3.jar;C:\Users\chunyue_peng\.m2\repository\com\sun\istack\istack-commons-runtime\3.0.11\istack-commons-runtime-3.0.11.jar;C:\Users\chunyue_peng\.m2\repository\com\sun\activation\jakarta.activation\1.2.2\jakarta.activation-1.2.2.jar;C:\Users\chunyue_peng\.m2\repository\org\springframework\data\spring-data-jpa\2.3.4.RELEASE\spring-data-jpa-2.3.4.RELEASE.jar;C:\Users\chunyue_peng\.m2\repository\org\springframework\data\spring-data-commons\2.3.4.RELEASE\spring-data-commons-2.3.4.RELEASE.jar;C:\Users\chunyue_peng\.m2\repository\org\springframework\spring-orm\5.2.9.RELEASE\spring-orm-5.2.9.RELEASE.jar;C:\Users\chunyue_peng\.m2\repository\org\springframework\spring-context\5.2.9.RELEASE\spring-context-5.2.9.RELEASE.jar;C:\Users\chunyue_peng\.m2\repository\org\springframework\spring-expression\5.2.9.RELEASE\spring-expression-5.2.9.RELEASE.jar;C:\Users\chunyue_peng\.m2\repository\org\springframework\spring-tx\5.2.9.RELEASE\spring-tx-5.2.9.RELEASE.jar;C:\Users\chunyue_peng\.m2\repository\org\springframework\spring-beans\5.2.9.RELEASE\spring-beans-5.2.9.RELEASE.jar;C:\Users\chunyue_peng\.m2\repository\org\slf4j\slf4j-api\1.7.30\slf4j-api-1.7.30.jar;C:\Users\chunyue_peng\.m2\repository\org\springframework\spring-aspects\5.2.9.RELEASE\spring-aspects-5.2.9.RELEASE.jar;C:\Users\chunyue_peng\.m2\repository\mysql\mysql-connector-java\8.0.21\mysql-connector-java-8.0.21.jar;C:\Users\chunyue_peng\.m2\repository\org\springframework\boot\spring-boot-starter\2.3.4.RELEASE\spring-boot-starter-2.3.4.RELEASE.jar;C:\Users\chunyue_peng\.m2\repository\org\springframework\boot\spring-boot\2.3.4.RELEASE\spring-boot-2.3.4.RELEASE.jar;C:\Users\chunyue_peng\.m2\repository\org\springframework\boot\spring-boot-autoconfigure\2.3.4.RELEASE\spring-boot-autoconfigure-2.3.4.RELEASE.jar;C:\Users\chunyue_peng\.m2\repository\org\springframework\boot\spring-boot-starter-logging\2.3.4.RELEASE\spring-boot-starter-logging-2.3.4.RELEASE.jar;C:\Users\chunyue_peng\.m2\repository\ch\qos\logback\logback-classic\1.2.3\logback-classic-1.2.3.jar;C:\Users\chunyue_peng\.m2\repository\ch\qos\logback\logback-core\1.2.3\logback-core-1.2.3.jar;C:\Users\chunyue_peng\.m2\repository\org\apache\logging\log4j\log4j-to-slf4j\2.13.3\log4j-to-slf4j-2.13.3.jar;C:\Users\chunyue_peng\.m2\repository\org\apache\logging\log4j\log4j-api\2.13.3\log4j-api-2.13.3.jar;C:\Users\chunyue_peng\.m2\repository\org\slf4j\jul-to-slf4j\1.7.30\jul-to-slf4j-1.7.30.jar;C:\Users\chunyue_peng\.m2\repository\jakarta\annotation\jakarta.annotation-api\1.3.5\jakarta.annotation-api-1.3.5.jar;C:\Users\chunyue_peng\.m2\repository\org\yaml\snakeyaml\1.26\snakeyaml-1.26.jar;C:\Users\chunyue_peng\.m2\repository\jakarta\xml\bind\jakarta.xml.bind-api\2.3.3\jakarta.xml.bind-api-2.3.3.jar;C:\Users\chunyue_peng\.m2\repository\jakarta\activation\jakarta.activation-api\1.2.2\jakarta.activation-api-1.2.2.jar;C:\Users\chunyue_peng\.m2\repository\org\springframework\spring-core\5.2.9.RELEASE\spring-core-5.2.9.RELEASE.jar;C:\Users\chunyue_peng\.m2\repository\org\springframework\spring-jcl\5.2.9.RELEASE\spring-jcl-5.2.9.RELEASE.jar;C:\Users\chunyue_peng\.m2\repository\com\fasterxml\jackson\core\jackson-databind\2.11.3\jackson-databind-2.11.3.jar;C:\Users\chunyue_peng\.m2\repository\com\fasterxml\jackson\core\jackson-annotations\2.11.2\jackson-annotations-2.11.2.jar;C:\Users\chunyue_peng\.m2\repository\com\fasterxml\jackson\core\jackson-core\2.11.2\jackson-core-2.11.2.jar thread.VolatileTest
+CompilerOracle: print *VolatileTest.testVolatile
+CompilerOracle: print *VolatileTest.testNonvolatile
+Java HotSpot(TM) 64-Bit Server VM warning: printing of assembly code is enabled; turning on DebugNonSafepoints to gain additional output
+Compiled method (c1)     966 1878       3       thread.VolatileTest::testVolatile (12 bytes)
+ total in heap  [0x000002c53322c090,0x000002c53322c4f8] = 1128
+ relocation     [0x000002c53322c1b0,0x000002c53322c1f0] = 64
+ main code      [0x000002c53322c200,0x000002c53322c360] = 352
+ stub code      [0x000002c53322c360,0x000002c53322c410] = 176
+ oops           [0x000002c53322c410,0x000002c53322c418] = 8
+ metadata       [0x000002c53322c418,0x000002c53322c420] = 8
+ scopes data    [0x000002c53322c420,0x000002c53322c460] = 64
+ scopes pcs     [0x000002c53322c460,0x000002c53322c4f0] = 144
+ dependencies   [0x000002c53322c4f0,0x000002c53322c4f8] = 8
+Loaded disassembler from D:\Java\jdk1.8\jre\bin\server\hsdis-amd64.dll
+Decoding compiled method 0x000002c53322c090:
+Code:
+Argument 0 is unknown.RIP: 0x2c53322c200 Code size: 0x00000210
+[Disassembling for mach='amd64']
+[Entry Point]
+[Constants]
+  # {method} {0x000002c54b962ac8} 'testVolatile' '()V' in 'thread/VolatileTest'
+  #           [sp+0x50]  (sp of caller)
+  0x000002c53322c200: mov     r10d,dword ptr [rdx+8h]
+  0x000002c53322c204: shl     r10,3h
+  0x000002c53322c208: cmp     r10,rax
+  0x000002c53322c20b: jne     2c532e15f60h      ;   {runtime_call}
+  0x000002c53322c211: nop     word ptr [rax+rax+0h]
+  0x000002c53322c21c: nop
+[Verified Entry Point]
+  0x000002c53322c220: mov     dword ptr [rsp+0ffffffffffffa000h],eax
+  0x000002c53322c227: push    rbp
+  0x000002c53322c228: sub     rsp,40h
+  0x000002c53322c22c: mov     rsi,2c54b963178h  ;   {metadata(method data for {method} {0x000002c54b962ac8} 'testVolatile' '()V' in 'thread/VolatileTest')}
+  0x000002c53322c236: mov     edi,dword ptr [rsi+0dch]
+  0x000002c53322c23c: add     edi,8h
+  0x000002c53322c23f: mov     dword ptr [rsi+0dch],edi
+  0x000002c53322c245: mov     rsi,2c54b962ac0h  ;   {metadata({method} {0x000002c54b962ac8} 'testVolatile' '()V' in 'thread/VolatileTest')}
+  0x000002c53322c24f: and     edi,0h
+  0x000002c53322c252: cmp     edi,0h
+  0x000002c53322c255: je      2c53322c2fch      ;*aload_0
+                                                ; - thread.VolatileTest::testVolatile@0 (line 12)
+
+  0x000002c53322c25b: mov     qword ptr [rsp+28h],rdx
+  0x000002c53322c260: mov     rdx,7c0000f28h    ;   {metadata('java/lang/Object')}
+  0x000002c53322c26a: mov     rax,qword ptr [r15+60h]
+  0x000002c53322c26e: lea     rdi,[rax+10h]
+  0x000002c53322c272: cmp     rdi,qword ptr [r15+70h]
+  0x000002c53322c276: jnbe    2c53322c313h
+  0x000002c53322c27c: mov     qword ptr [r15+60h],rdi
+  0x000002c53322c280: mov     rcx,qword ptr [rdx+0a8h]
+  0x000002c53322c287: mov     qword ptr [rax],rcx
+  0x000002c53322c28a: mov     rcx,rdx
+  0x000002c53322c28d: shr     rcx,3h
+  0x000002c53322c291: mov     dword ptr [rax+8h],ecx
+  0x000002c53322c294: xor     rcx,rcx
+  0x000002c53322c297: mov     dword ptr [rax+0ch],ecx
+  0x000002c53322c29a: xor     rcx,rcx           ;*new  ; - thread.VolatileTest::testVolatile@1 (line 12)
+
+  0x000002c53322c29d: mov     rdx,rax
+  0x000002c53322c2a0: mov     rsi,2c54b963178h  ;   {metadata(method data for {method} {0x000002c54b962ac8} 'testVolatile' '()V' in 'thread/VolatileTest')}
+  0x000002c53322c2aa: add     qword ptr [rsi+108h],1h
+  0x000002c53322c2b2: mov     rdx,rax           ;*invokespecial <init>
+                                                ; - thread.VolatileTest::testVolatile@5 (line 12)
+
+  0x000002c53322c2b5: mov     qword ptr [rsp+20h],rax
+  0x000002c53322c2ba: nop
+  0x000002c53322c2bb: nop
+  0x000002c53322c2bc: nop
+  0x000002c53322c2bd: nop
+  0x000002c53322c2be: nop
+  0x000002c53322c2bf: call    2c532e161a0h      ; OopMap{[40]=Oop [32]=Oop off=196}
+                                                ;*invokespecial <init>
+                                                ; - thread.VolatileTest::testVolatile@5 (line 12)
+                                                ;   {optimized virtual_call}
+...
+  0x000002c53322c2eb: lock add dword ptr [rsp],0h  ;*putfield varWithinVolatile
+                                                ; - thread.VolatileTest::testVolatile@8 (line 12)
+
+  0x000002c53322c2f0: add     rsp,40h
+  0x000002c53322c2f4: pop     rbp
+  0x000002c53322c2f5: test    dword ptr [2c532da0100h],eax
+                                                ;   {poll_return}
+  0x000002c53322c2fb: ret
+  0x000002c53322c2fc: mov     qword ptr [rsp+8h],rsi
+  0x000002c53322c301: mov     qword ptr [rsp],0ffffffffffffffffh
+  0x000002c53322c309: call    2c532ed2ba0h      ; OopMap{rdx=Oop off=270}
+                                                ;*synchronization entry
+                                                ; - thread.VolatileTest::testVolatile@-1 (line 12)
+                                                ;   {runtime_call}
+  0x000002c53322c30e: jmp     2c53322c25bh
+  0x000002c53322c313: mov     rdx,rdx
+  0x000002c53322c316: call    2c532ece8c0h      ; OopMap{[40]=Oop off=283}
+                                                ;*new  ; - thread.VolatileTest::testVolatile@1 (line 12)
+                                                ;   {runtime_call}
+  0x000002c53322c31b: jmp     2c53322c29dh
+  0x000002c53322c31d: nop
+  0x000002c53322c31e: nop
+  0x000002c53322c31f: mov     rax,qword ptr [r15+2a8h]
+  0x000002c53322c326: mov     r10,0h
+  0x000002c53322c330: mov     qword ptr [r15+2a8h],r10
+  0x000002c53322c337: mov     r10,0h
+  0x000002c53322c341: mov     qword ptr [r15+2b0h],r10
+  0x000002c53322c348: add     rsp,40h
+  0x000002c53322c34c: pop     rbp
+  0x000002c53322c34d: jmp     2c532ecd820h      ;   {runtime_call}
+  0x000002c53322c352: hlt
+  0x000002c53322c353: hlt
+  0x000002c53322c354: hlt
+  0x000002c53322c355: hlt
+  0x000002c53322c356: hlt
+  0x000002c53322c357: hlt
+  0x000002c53322c358: hlt
+  0x000002c53322c359: hlt
+  0x000002c53322c35a: hlt
+  0x000002c53322c35b: hlt
+  0x000002c53322c35c: hlt
+  0x000002c53322c35d: hlt
+  0x000002c53322c35e: hlt
+  0x000002c53322c35f: hlt
+[Stub Code]
+  0x000002c53322c360: nop                       ;   {no_reloc}
+  0x000002c53322c361: nop
+  0x000002c53322c362: nop
+  0x000002c53322c363: nop
+  0x000002c53322c364: nop
+  0x000002c53322c365: mov     rbx,0h            ;   {static_stub}
+  0x000002c53322c36f: jmp     2c53322c36fh      ;   {runtime_call}
+[Exception Handler]
+  0x000002c53322c374: call    2c532ed0120h      ;   {runtime_call}
+  0x000002c53322c379: mov     qword ptr [rsp+0ffffffffffffffd8h],rsp
+  0x000002c53322c37e: sub     rsp,80h
+  0x000002c53322c385: mov     qword ptr [rsp+78h],rax
+  0x000002c53322c38a: mov     qword ptr [rsp+70h],rcx
+  0x000002c53322c38f: mov     qword ptr [rsp+68h],rdx
+  0x000002c53322c394: mov     qword ptr [rsp+60h],rbx
+  0x000002c53322c399: mov     qword ptr [rsp+50h],rbp
+  0x000002c53322c39e: mov     qword ptr [rsp+48h],rsi
+  0x000002c53322c3a3: mov     qword ptr [rsp+40h],rdi
+  0x000002c53322c3a8: mov     qword ptr [rsp+38h],r8
+  0x000002c53322c3ad: mov     qword ptr [rsp+30h],r9
+  0x000002c53322c3b2: mov     qword ptr [rsp+28h],r10
+  0x000002c53322c3b7: mov     qword ptr [rsp+20h],r11
+  0x000002c53322c3bc: mov     qword ptr [rsp+18h],r12
+  0x000002c53322c3c1: mov     qword ptr [rsp+10h],r13
+  0x000002c53322c3c6: mov     qword ptr [rsp+8h],r14
+  0x000002c53322c3cb: mov     qword ptr [rsp],r15
+  0x000002c53322c3cf: mov     rcx,6040d740h     ;   {external_word}
+  0x000002c53322c3d9: mov     rdx,2c53322c379h  ;   {internal_word}
+  0x000002c53322c3e3: mov     r8,rsp
+  0x000002c53322c3e6: and     rsp,0fffffffffffffff0h
+  0x000002c53322c3ea: mov     r10,600ed310h     ;   {runtime_call}
+  0x000002c53322c3f4: call indirect r10
+  0x000002c53322c3f7: hlt
+[Deopt Handler Code]
+  0x000002c53322c3f8: mov     r10,2c53322c3f8h  ;   {section_word}
+  0x000002c53322c402: push    r10
+  0x000002c53322c404: jmp     2c532e17600h      ;   {runtime_call}
+  0x000002c53322c409: hlt
+  0x000002c53322c40a: hlt
+  0x000002c53322c40b: hlt
+  0x000002c53322c40c: hlt
+  0x000002c53322c40d: hlt
+  0x000002c53322c40e: hlt
+  0x000002c53322c40f: hlt
+OopMapSet contains 3 OopMaps
+
+#0 
+OopMap{[40]=Oop [32]=Oop off=196}
+#1 
+OopMap{rdx=Oop off=270}
+#2 
+OopMap{[40]=Oop off=283}
+Compiled method (c2)     975 1880       4       thread.VolatileTest::testVolatile (12 bytes)
+ total in heap  [0x000002c533230810,0x000002c533230b68] = 856
+ relocation     [0x000002c533230930,0x000002c533230958] = 40
+ main code      [0x000002c533230960,0x000002c533230a40] = 224
+ stub code      [0x000002c533230a40,0x000002c533230a68] = 40
+ oops           [0x000002c533230a68,0x000002c533230a70] = 8
+ metadata       [0x000002c533230a70,0x000002c533230a80] = 16
+ scopes data    [0x000002c533230a80,0x000002c533230ab0] = 48
+ scopes pcs     [0x000002c533230ab0,0x000002c533230b30] = 128
+ dependencies   [0x000002c533230b30,0x000002c533230b38] = 8
+ handler table  [0x000002c533230b38,0x000002c533230b68] = 48
+Decoding compiled method 0x000002c533230810:
+Code:
+Argument 0 is unknown.RIP: 0x2c533230960 Code size: 0x00000108
+[Entry Point]
+[Constants]
+  # {method} {0x000002c54b962ac8} 'testVolatile' '()V' in 'thread/VolatileTest'
+  #           [sp+0x30]  (sp of caller)
+  0x000002c533230960: mov     r10d,dword ptr [rdx+8h]
+  0x000002c533230964: shl     r10,3h
+  0x000002c533230968: cmp     rax,r10
+  0x000002c53323096b: jne     2c532e15f60h      ;   {runtime_call}
+  0x000002c533230971: nop
+  0x000002c533230974: nop     dword ptr [rax+rax+0h]
+  0x000002c53323097c: nop
+[Verified Entry Point]
+  0x000002c533230980: mov     dword ptr [rsp+0ffffffffffffa000h],eax
+  0x000002c533230987: push    rbp
+  0x000002c533230988: sub     rsp,20h           ;*synchronization entry
+                                                ; - thread.VolatileTest::testVolatile@-1 (line 12)
+
+  0x000002c53323098c: mov     qword ptr [rsp],rdx
+  0x000002c533230990: mov     rax,qword ptr [r15+60h]
+  0x000002c533230994: mov     r10,rax
+  0x000002c533230997: add     r10,10h
+  0x000002c53323099b: cmp     r10,qword ptr [r15+70h]
+  0x000002c53323099f: jnb     2c533230a16h
+  0x000002c5332309a1: mov     qword ptr [r15+60h],r10
+  0x000002c5332309a5: prefetchw byte ptr [r10+100h]
+  0x000002c5332309ad: mov     r11d,0f80001e5h   ;   {metadata('java/lang/Object')}
+  0x000002c5332309b3: mov     r10,0h
+  0x000002c5332309bd: lea     r10,[r10+r11*8]
+  0x000002c5332309c1: mov     r10,qword ptr [r10+0a8h]
+  0x000002c5332309c8: mov     qword ptr [rax],r10
+  0x000002c5332309cb: mov     dword ptr [rax+8h],0f80001e5h
+                                                ;   {metadata('java/lang/Object')}
+  0x000002c5332309d2: mov     dword ptr [rax+0ch],r12d
+  0x000002c5332309d6: mov     rbp,rax           ;*new  ; - thread.VolatileTest::testVolatile@1 (line 12)
+
+  0x000002c5332309d9: mov     rdx,rbp
+  0x000002c5332309dc: nop
+  0x000002c5332309df: call    2c532e161a0h      ; OopMap{rbp=Oop [0]=Oop off=132}
+                                                ;*invokespecial <init>
+                                                ; - thread.VolatileTest::testVolatile@5 (line 12)
+                                                ;   {optimized virtual_call}
+  0x000002c5332309e4: mov     r11,rbp
+  0x000002c5332309e7: shr     r11,3h
+  0x000002c5332309eb: mov     r10,qword ptr [rsp]
+  0x000002c5332309ef: mov     dword ptr [r10+0ch],r11d
+  0x000002c5332309f3: shr     r10,9h
+  0x000002c5332309f7: mov     r11,2c53eb75000h
+  0x000002c533230a01: mov     byte ptr [r11+r10],r12l
+  0x000002c533230a05: lock add dword ptr [rsp],0h  ;*putfield varWithinVolatile
+                                                ; - thread.VolatileTest::testVolatile@8 (line 12)
+
+  0x000002c533230a0a: add     rsp,20h
+  0x000002c533230a0e: pop     rbp
+  0x000002c533230a0f: test    dword ptr [2c532da0000h],eax
+                                                ;   {poll_return}
+  0x000002c533230a15: ret
+  0x000002c533230a16: mov     rdx,7c0000f28h    ;   {metadata('java/lang/Object')}
+  0x000002c533230a20: mov     rbp,qword ptr [rsp]
+  0x000002c533230a24: nop
+  0x000002c533230a27: call    2c532ed5d20h      ; OopMap{rbp=Oop [0]=Oop off=204}
+                                                ;*new  ; - thread.VolatileTest::testVolatile@1 (line 12)
+                                                ;   {runtime_call}
+  0x000002c533230a2c: jmp     2c5332309d6h
+  0x000002c533230a2e: mov     rdx,rax
+  0x000002c533230a31: jmp     2c533230a36h
+  0x000002c533230a33: mov     rdx,rax           ;*new  ; - thread.VolatileTest::testVolatile@1 (line 12)
+
+  0x000002c533230a36: add     rsp,20h
+  0x000002c533230a3a: pop     rbp
+  0x000002c533230a3b: jmp     2c532ed40a0h      ;   {runtime_call}
+[Stub Code]
+  0x000002c533230a40: mov     rbx,0h            ;   {no_reloc}
+  0x000002c533230a4a: jmp     2c533230a4ah      ;   {runtime_call}
+[Exception Handler]
+  0x000002c533230a4f: jmp     2c532ecdb20h      ;   {runtime_call}
+[Deopt Handler Code]
+  0x000002c533230a54: call    2c533230a59h
+  0x000002c533230a59: sub     qword ptr [rsp],5h
+  0x000002c533230a5e: jmp     2c532e17600h      ;   {runtime_call}
+  0x000002c533230a63: hlt
+  0x000002c533230a64: hlt
+  0x000002c533230a65: hlt
+  0x000002c533230a66: hlt
+  0x000002c533230a67: hlt
+OopMapSet contains 2 OopMaps
+
+#0 
+OopMap{rbp=Oop [0]=Oop off=132}
+#1 
+OopMap{rbp=Oop [0]=Oop off=204}
+Compiled method (c1)     982 1885       3       thread.VolatileTest::testNonvolatile (12 bytes)
+ total in heap  [0x000002c533230c90,0x000002c5332310f8] = 1128
+ relocation     [0x000002c533230db0,0x000002c533230df0] = 64
+ main code      [0x000002c533230e00,0x000002c533230f60] = 352
+ stub code      [0x000002c533230f60,0x000002c533231010] = 176
+ oops           [0x000002c533231010,0x000002c533231018] = 8
+ metadata       [0x000002c533231018,0x000002c533231020] = 8
+ scopes data    [0x000002c533231020,0x000002c533231060] = 64
+ scopes pcs     [0x000002c533231060,0x000002c5332310f0] = 144
+ dependencies   [0x000002c5332310f0,0x000002c5332310f8] = 8
+Decoding compiled method 0x000002c533230c90:
+Code:
+Argument 0 is unknown.RIP: 0x2c533230e00 Code size: 0x00000210
+[Entry Point]
+[Constants]
+  # {method} {0x000002c54b962b70} 'testNonvolatile' '()V' in 'thread/VolatileTest'
+  #           [sp+0x50]  (sp of caller)
+  0x000002c533230e00: mov     r10d,dword ptr [rdx+8h]
+  0x000002c533230e04: shl     r10,3h
+  0x000002c533230e08: cmp     r10,rax
+  0x000002c533230e0b: jne     2c532e15f60h      ;   {runtime_call}
+  0x000002c533230e11: nop     word ptr [rax+rax+0h]
+  0x000002c533230e1c: nop
+[Verified Entry Point]
+  0x000002c533230e20: mov     dword ptr [rsp+0ffffffffffffa000h],eax
+  0x000002c533230e27: push    rbp
+  0x000002c533230e28: sub     rsp,40h
+  0x000002c533230e2c: mov     rsi,2c54b9632c8h  ;   {metadata(method data for {method} {0x000002c54b962b70} 'testNonvolatile' '()V' in 'thread/VolatileTest')}
+  0x000002c533230e36: mov     edi,dword ptr [rsi+0dch]
+  0x000002c533230e3c: add     edi,8h
+  0x000002c533230e3f: mov     dword ptr [rsi+0dch],edi
+  0x000002c533230e45: mov     rsi,2c54b962b68h  ;   {metadata({method} {0x000002c54b962b70} 'testNonvolatile' '()V' in 'thread/VolatileTest')}
+  0x000002c533230e4f: and     edi,0h
+  0x000002c533230e52: cmp     edi,0h
+  0x000002c533230e55: je      2c533230ef7h      ;*aload_0
+                                                ; - thread.VolatileTest::testNonvolatile@0 (line 15)
+
+  0x000002c533230e5b: mov     qword ptr [rsp+28h],rdx
+  0x000002c533230e60: mov     rdx,7c0000f28h    ;   {metadata('java/lang/Object')}
+  0x000002c533230e6a: mov     rax,qword ptr [r15+60h]
+  0x000002c533230e6e: lea     rdi,[rax+10h]
+  0x000002c533230e72: cmp     rdi,qword ptr [r15+70h]
+  0x000002c533230e76: jnbe    2c533230f0eh
+  0x000002c533230e7c: mov     qword ptr [r15+60h],rdi
+  0x000002c533230e80: mov     rcx,qword ptr [rdx+0a8h]
+  0x000002c533230e87: mov     qword ptr [rax],rcx
+  0x000002c533230e8a: mov     rcx,rdx
+  0x000002c533230e8d: shr     rcx,3h
+  0x000002c533230e91: mov     dword ptr [rax+8h],ecx
+  0x000002c533230e94: xor     rcx,rcx
+  0x000002c533230e97: mov     dword ptr [rax+0ch],ecx
+  0x000002c533230e9a: xor     rcx,rcx           ;*new  ; - thread.VolatileTest::testNonvolatile@1 (line 15)
+
+  0x000002c533230e9d: mov     rdx,rax
+  0x000002c533230ea0: mov     rsi,2c54b9632c8h  ;   {metadata(method data for {method} {0x000002c54b962b70} 'testNonvolatile' '()V' in 'thread/VolatileTest')}
+  0x000002c533230eaa: add     qword ptr [rsi+108h],1h
+  0x000002c533230eb2: mov     rdx,rax           ;*invokespecial <init>
+                                                ; - thread.VolatileTest::testNonvolatile@5 (line 15)
+
+  0x000002c533230eb5: mov     qword ptr [rsp+20h],rax
+  0x000002c533230eba: nop
+  0x000002c533230ebb: nop
+  0x000002c533230ebc: nop
+  0x000002c533230ebd: nop
+  0x000002c533230ebe: nop
+  0x000002c533230ebf: call    2c532e161a0h      ; OopMap{[40]=Oop [32]=Oop off=196}
+                                                ;*invokespecial <init>
+                                                ; - thread.VolatileTest::testNonvolatile@5 (line 15)
+                                                ;   {optimized virtual_call}
+  0x000002c533230ec4: mov     rax,qword ptr [rsp+20h]
+  0x000002c533230ec9: mov     rdx,qword ptr [rsp+28h]
+  0x000002c533230ece: mov     r10,rax
+  0x000002c533230ed1: shr     r10,3h
+  0x000002c533230ed5: mov     dword ptr [rdx+10h],r10d
+  0x000002c533230ed9: shr     rdx,9h
+  0x000002c533230edd: mov     rsi,2c53eb75000h
+  0x000002c533230ee7: mov     byte ptr [rdx+rsi],0h  ;*putfield varWithoutVolatile
+                                                ; - thread.VolatileTest::testNonvolatile@8 (line 15)
+
+  0x000002c533230eeb: add     rsp,40h
+  0x000002c533230eef: pop     rbp
+  0x000002c533230ef0: test    dword ptr [2c532da0100h],eax
+                                                ;   {poll_return}
+  0x000002c533230ef6: ret
+  0x000002c533230ef7: mov     qword ptr [rsp+8h],rsi
+  0x000002c533230efc: mov     qword ptr [rsp],0ffffffffffffffffh
+  0x000002c533230f04: call    2c532ed2ba0h      ; OopMap{rdx=Oop off=265}
+                                                ;*synchronization entry
+                                                ; - thread.VolatileTest::testNonvolatile@-1 (line 15)
+                                                ;   {runtime_call}
+  0x000002c533230f09: jmp     2c533230e5bh
+  0x000002c533230f0e: mov     rdx,rdx
+  0x000002c533230f11: call    2c532ece8c0h      ; OopMap{[40]=Oop off=278}
+                                                ;*new  ; - thread.VolatileTest::testNonvolatile@1 (line 15)
+                                                ;   {runtime_call}
+  0x000002c533230f16: jmp     2c533230e9dh
+  0x000002c533230f18: nop
+  0x000002c533230f19: nop
+  0x000002c533230f1a: mov     rax,qword ptr [r15+2a8h]
+  0x000002c533230f21: mov     r10,0h
+  0x000002c533230f2b: mov     qword ptr [r15+2a8h],r10
+  0x000002c533230f32: mov     r10,0h
+  0x000002c533230f3c: mov     qword ptr [r15+2b0h],r10
+  0x000002c533230f43: add     rsp,40h
+  0x000002c533230f47: pop     rbp
+  0x000002c533230f48: jmp     2c532ecd820h      ;   {runtime_call}
+  0x000002c533230f4d: hlt
+  0x000002c533230f4e: hlt
+  0x000002c533230f4f: hlt
+  0x000002c533230f50: hlt
+  0x000002c533230f51: hlt
+  0x000002c533230f52: hlt
+  0x000002c533230f53: hlt
+  0x000002c533230f54: hlt
+  0x000002c533230f55: hlt
+  0x000002c533230f56: hlt
+  0x000002c533230f57: hlt
+  0x000002c533230f58: hlt
+  0x000002c533230f59: hlt
+  0x000002c533230f5a: hlt
+  0x000002c533230f5b: hlt
+  0x000002c533230f5c: hlt
+  0x000002c533230f5d: hlt
+  0x000002c533230f5e: hlt
+  0x000002c533230f5f: hlt
+[Stub Code]
+  0x000002c533230f60: nop                       ;   {no_reloc}
+  0x000002c533230f61: nop
+  0x000002c533230f62: nop
+  0x000002c533230f63: nop
+  0x000002c533230f64: nop
+  0x000002c533230f65: mov     rbx,0h            ;   {static_stub}
+  0x000002c533230f6f: jmp     2c533230f6fh      ;   {runtime_call}
+[Exception Handler]
+  0x000002c533230f74: call    2c532ed0120h      ;   {runtime_call}
+  0x000002c533230f79: mov     qword ptr [rsp+0ffffffffffffffd8h],rsp
+  0x000002c533230f7e: sub     rsp,80h
+  0x000002c533230f85: mov     qword ptr [rsp+78h],rax
+  0x000002c533230f8a: mov     qword ptr [rsp+70h],rcx
+  0x000002c533230f8f: mov     qword ptr [rsp+68h],rdx
+  0x000002c533230f94: mov     qword ptr [rsp+60h],rbx
+  0x000002c533230f99: mov     qword ptr [rsp+50h],rbp
+  0x000002c533230f9e: mov     qword ptr [rsp+48h],rsi
+  0x000002c533230fa3: mov     qword ptr [rsp+40h],rdi
+  0x000002c533230fa8: mov     qword ptr [rsp+38h],r8
+  0x000002c533230fad: mov     qword ptr [rsp+30h],r9
+  0x000002c533230fb2: mov     qword ptr [rsp+28h],r10
+  0x000002c533230fb7: mov     qword ptr [rsp+20h],r11
+  0x000002c533230fbc: mov     qword ptr [rsp+18h],r12
+  0x000002c533230fc1: mov     qword ptr [rsp+10h],r13
+  0x000002c533230fc6: mov     qword ptr [rsp+8h],r14
+  0x000002c533230fcb: mov     qword ptr [rsp],r15
+  0x000002c533230fcf: mov     rcx,6040d740h     ;   {external_word}
+  0x000002c533230fd9: mov     rdx,2c533230f79h  ;   {internal_word}
+  0x000002c533230fe3: mov     r8,rsp
+  0x000002c533230fe6: and     rsp,0fffffffffffffff0h
+  0x000002c533230fea: mov     r10,600ed310h     ;   {runtime_call}
+  0x000002c533230ff4: call indirect r10
+  0x000002c533230ff7: hlt
+[Deopt Handler Code]
+  0x000002c533230ff8: mov     r10,2c533230ff8h  ;   {section_word}
+  0x000002c533231002: push    r10
+  0x000002c533231004: jmp     2c532e17600h      ;   {runtime_call}
+  0x000002c533231009: hlt
+  0x000002c53323100a: hlt
+  0x000002c53323100b: hlt
+  0x000002c53323100c: hlt
+  0x000002c53323100d: hlt
+  0x000002c53323100e: hlt
+  0x000002c53323100f: hlt
+OopMapSet contains 3 OopMaps
+
+#0 
+OopMap{[40]=Oop [32]=Oop off=196}
+#1 
+OopMap{rdx=Oop off=265}
+#2 
+OopMap{[40]=Oop off=278}
+Compiled method (c2)     990 1889       4       thread.VolatileTest::testNonvolatile (12 bytes)
+ total in heap  [0x000002c53322d890,0x000002c53322dbd0] = 832
+ relocation     [0x000002c53322d9b0,0x000002c53322d9d8] = 40
+ main code      [0x000002c53322d9e0,0x000002c53322dac0] = 224
+ stub code      [0x000002c53322dac0,0x000002c53322dae8] = 40
+ oops           [0x000002c53322dae8,0x000002c53322daf0] = 8
+ metadata       [0x000002c53322daf0,0x000002c53322db00] = 16
+ scopes data    [0x000002c53322db00,0x000002c53322db28] = 40
+ scopes pcs     [0x000002c53322db28,0x000002c53322db98] = 112
+ dependencies   [0x000002c53322db98,0x000002c53322dba0] = 8
+ handler table  [0x000002c53322dba0,0x000002c53322dbd0] = 48
+Decoding compiled method 0x000002c53322d890:
+Code:
+Argument 0 is unknown.RIP: 0x2c53322d9e0 Code size: 0x00000108
+[Entry Point]
+[Constants]
+  # {method} {0x000002c54b962b70} 'testNonvolatile' '()V' in 'thread/VolatileTest'
+  #           [sp+0x30]  (sp of caller)
+  0x000002c53322d9e0: mov     r10d,dword ptr [rdx+8h]
+  0x000002c53322d9e4: shl     r10,3h
+  0x000002c53322d9e8: cmp     rax,r10
+  0x000002c53322d9eb: jne     2c532e15f60h      ;   {runtime_call}
+  0x000002c53322d9f1: nop
+  0x000002c53322d9f4: nop     dword ptr [rax+rax+0h]
+  0x000002c53322d9fc: nop
+[Verified Entry Point]
+  0x000002c53322da00: mov     dword ptr [rsp+0ffffffffffffa000h],eax
+  0x000002c53322da07: push    rbp
+  0x000002c53322da08: sub     rsp,20h           ;*synchronization entry
+                                                ; - thread.VolatileTest::testNonvolatile@-1 (line 15)
+
+  0x000002c53322da0c: mov     qword ptr [rsp],rdx
+  0x000002c53322da10: mov     rax,qword ptr [r15+60h]
+  0x000002c53322da14: mov     r10,rax
+  0x000002c53322da17: add     r10,10h
+  0x000002c53322da1b: cmp     r10,qword ptr [r15+70h]
+  0x000002c53322da1f: jnb     2c53322da94h
+  0x000002c53322da21: mov     qword ptr [r15+60h],r10
+  0x000002c53322da25: prefetchw byte ptr [r10+100h]
+  0x000002c53322da2d: mov     r11d,0f80001e5h   ;   {metadata('java/lang/Object')}
+  0x000002c53322da33: mov     r10,0h
+  0x000002c53322da3d: lea     r10,[r10+r11*8]
+  0x000002c53322da41: mov     r10,qword ptr [r10+0a8h]
+  0x000002c53322da48: mov     qword ptr [rax],r10
+  0x000002c53322da4b: mov     dword ptr [rax+8h],0f80001e5h
+                                                ;   {metadata('java/lang/Object')}
+  0x000002c53322da52: mov     dword ptr [rax+0ch],r12d
+  0x000002c53322da56: mov     rbp,rax           ;*new  ; - thread.VolatileTest::testNonvolatile@1 (line 15)
+
+  0x000002c53322da59: mov     rdx,rbp
+  0x000002c53322da5c: nop
+  0x000002c53322da5f: call    2c532e161a0h      ; OopMap{rbp=Oop [0]=Oop off=132}
+                                                ;*invokespecial <init>
+                                                ; - thread.VolatileTest::testNonvolatile@5 (line 15)
+                                                ;   {optimized virtual_call}
+  0x000002c53322da64: mov     r11,qword ptr [rsp]
+  0x000002c53322da68: mov     r10,r11
+  0x000002c53322da6b: mov     r8,rbp
+  0x000002c53322da6e: shr     r8,3h
+  0x000002c53322da72: mov     dword ptr [r11+10h],r8d
+  0x000002c53322da76: shr     r10,9h
+  0x000002c53322da7a: mov     r11,2c53eb75000h
+  0x000002c53322da84: mov     byte ptr [r11+r10],r12l
+  0x000002c53322da88: add     rsp,20h
+  0x000002c53322da8c: pop     rbp
+  0x000002c53322da8d: test    dword ptr [2c532da0000h],eax
+                                                ;   {poll_return}
+  0x000002c53322da93: ret
+  0x000002c53322da94: mov     rdx,7c0000f28h    ;   {metadata('java/lang/Object')}
+  0x000002c53322da9e: mov     rbp,qword ptr [rsp]
+  0x000002c53322daa2: nop
+  0x000002c53322daa3: call    2c532ed5d20h      ; OopMap{rbp=Oop [0]=Oop off=200}
+                                                ;*new  ; - thread.VolatileTest::testNonvolatile@1 (line 15)
+                                                ;   {runtime_call}
+  0x000002c53322daa8: jmp     2c53322da56h
+  0x000002c53322daaa: mov     rdx,rax
+  0x000002c53322daad: jmp     2c53322dab2h
+  0x000002c53322daaf: mov     rdx,rax           ;*new  ; - thread.VolatileTest::testNonvolatile@1 (line 15)
+
+  0x000002c53322dab2: add     rsp,20h
+  0x000002c53322dab6: pop     rbp
+  0x000002c53322dab7: jmp     2c532ed40a0h      ;   {runtime_call}
+  0x000002c53322dabc: hlt
+  0x000002c53322dabd: hlt
+  0x000002c53322dabe: hlt
+  0x000002c53322dabf: hlt
+[Stub Code]
+  0x000002c53322dac0: mov     rbx,0h            ;   {no_reloc}
+  0x000002c53322daca: jmp     2c53322dacah      ;   {runtime_call}
+[Exception Handler]
+  0x000002c53322dacf: jmp     2c532ecdb20h      ;   {runtime_call}
+[Deopt Handler Code]
+  0x000002c53322dad4: call    2c53322dad9h
+  0x000002c53322dad9: sub     qword ptr [rsp],5h
+  0x000002c53322dade: jmp     2c532e17600h      ;   {runtime_call}
+  0x000002c53322dae3: hlt
+  0x000002c53322dae4: hlt
+  0x000002c53322dae5: hlt
+  0x000002c53322dae6: hlt
+  0x000002c53322dae7: hlt
+OopMapSet contains 2 OopMaps
+
+#0 
+OopMap{rbp=Oop [0]=Oop off=132}
+#1 
+OopMap{rbp=Oop [0]=Oop off=200}
+
+Process finished with exit code 0
