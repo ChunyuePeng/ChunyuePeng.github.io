@@ -99,7 +99,7 @@
 <meta property="og:image" content="http://chunyuepeng.github.io/posts/48291f2c/1.png">
 <meta property="og:image" content="http://chunyuepeng.github.io/posts/48291f2c/2.png">
 <meta property="article:published_time" content="2021-05-07T06:41:45.000Z">
-<meta property="article:modified_time" content="2021-05-07T07:58:49.375Z">
+<meta property="article:modified_time" content="2021-05-07T11:35:41.397Z">
 <meta property="article:author" content="彭椿悦">
 <meta property="article:tag" content="Java虚拟机">
 <meta name="twitter:card" content="summary">
@@ -419,7 +419,7 @@
 <h2 id="方法返回地址"><a href="#方法返回地址" class="headerlink" title="方法返回地址"></a>方法返回地址</h2><p>当执行引擎遇到任意一个方法返回的字节码指令或在执行过程中遇到了异常，这时候可能会有返回值传递给方法调用者。</p>
 <h1 id="本地方法栈"><a href="#本地方法栈" class="headerlink" title="本地方法栈"></a>本地方法栈</h1><p>本地方法栈和虚拟机栈是类似的，它们的区别就是：本地方法栈执行的是native方法，Java虚拟机栈执行的是Java方法。<br>在该区域所规定的异常和Java虚拟机栈的异常一致。</p>
 <h1 id="Java堆"><a href="#Java堆" class="headerlink" title="Java堆"></a>Java堆</h1><p>Java堆是虚拟机所管理的内存中最大的一块。Java堆是被所有线程共享的一块内存区域，该区域的唯一目的就是存放对象实例。在Java中几乎所有的对象实例都是在这里分配内存，当一个对象通过逃逸分析出来该对象的调用仅仅只是在该方法中调用的话，可能虚拟机就会直接在虚拟机栈上为该对象分配内存，该方法执行完成之后该对象也就直接被回收了。<br>《Java虚拟机规范》在该区域中定义了一种异常：如果在Java队中没有内存完成实例分配，且堆无法再扩展时会抛出OutOfMemoryError异常。</p>
-<h1 id="方法区"><a href="#方法区" class="headerlink" title="方法区"></a>方法区</h1><p>方法区存放的是被虚拟机加载的类型信息、常量、静态变量、即使编译后的代码缓存等数据。该区域也是线程共享的区域。<br>根据《Java虚拟机规范》的规定，如果方法区无法满足新的内存分配需求时，将抛出OutOfMemoryError异常。</p>
+<h1 id="方法区"><a href="#方法区" class="headerlink" title="方法区"></a>方法区</h1><p>方法区存放的是被虚拟机加载的类型信息、常量、静态变量、即时编译后的代码缓存等数据。该区域也是线程共享的区域。<br>根据《Java虚拟机规范》的规定，如果方法区无法满足新的内存分配需求时，将抛出OutOfMemoryError异常。</p>
 <h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1>
       
     </div>
@@ -439,7 +439,7 @@
   <p><span>本文标题:</span><a href="/posts/48291f2c/">java虚拟机运行时数据区域</a></p>
   <p><span>文章作者:</span><a href="/" title="访问 彭椿悦 的个人博客">彭椿悦</a></p>
   <p><span>发布时间:</span>2021年05月07日 - 14:05</p>
-  <p><span>最后更新:</span>2021年05月07日 - 15:05</p>
+  <p><span>最后更新:</span>2021年05月07日 - 19:05</p>
   <p><span>原始链接:</span><a href="/posts/48291f2c/" title="java虚拟机运行时数据区域">http://chunyuepeng.github.io/posts/48291f2c/</a>
     <span class="copy-path"  title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="http://chunyuepeng.github.io/posts/48291f2c/"  aria-label="复制成功！"></i></span>
   </p>
@@ -506,6 +506,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/e9f911f5/" rel="prev" title="java线程池异常处理机制">
+                java线程池异常处理机制 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -586,7 +590,7 @@
               
                 <a href="/archives/%7C%7C%20archive">
               
-                  <span class="site-state-item-count">33</span>
+                  <span class="site-state-item-count">34</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -599,7 +603,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-count">27</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>
@@ -632,6 +636,10 @@
       
       
         <li class="recent_posts_li">
+          <a href="/posts/e9f911f5/" title="java线程池异常处理机制" target="_blank">java线程池异常处理机制</a>
+        </li>
+      
+        <li class="recent_posts_li">
           <a href="/posts/48291f2c/" title="java虚拟机运行时数据区域" target="_blank">java虚拟机运行时数据区域</a>
         </li>
       
@@ -645,10 +653,6 @@
       
         <li class="recent_posts_li">
           <a href="/posts/91e798bc/" title="Java内存模型" target="_blank">Java内存模型</a>
-        </li>
-      
-        <li class="recent_posts_li">
-          <a href="/posts/4263f441/" title="平衡二叉树" target="_blank">平衡二叉树</a>
         </li>
       
     </ul>
@@ -730,7 +734,7 @@
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">52.2k</span>
+    <span title="Site words total count">54.7k</span>
   
 </div>
 
@@ -754,7 +758,7 @@
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count">博客全站共52.2k字</span>
+  <span class="post-count">博客全站共54.7k字</span>
 </div>
 
 
